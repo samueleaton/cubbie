@@ -6,7 +6,7 @@ var event = function () {
   var events = {};
 
   function isStateEvent(evt) {
-    return evt === 'STATE_RESET' || evt === 'STATE_REVERTED' || evt === 'STATE_MODIFIED' || evt === 'STATE_PROBED';
+    return evt === 'STATE_SET' || evt === 'STATE_RESET' || evt === 'STATE_REVERTED' || evt === 'STATE_MODIFIED' || evt === 'STATE_PROBED';
   }
   function on(evt, cb) {
     if (!_.isArray(events[evt])) events[evt] = [];
@@ -17,7 +17,7 @@ var event = function () {
       args[_key - 1] = arguments[_key];
     }
 
-    if (!event[evt]) return;
+    if (!events[evt]) return;
     if (isStateEvent(evt)) {
       (0, _lodash.each)(events[evt], function (cb) {
         return cb.apply(undefined, [currentState()].concat(args));
@@ -60,6 +60,7 @@ function previousState() {
 }
 function setInitialState(obj) {
   states[0] = obj;
+  event.emit('STATE_SET');
 }
 function setState(obj) {
   states.push(obj);

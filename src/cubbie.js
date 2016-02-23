@@ -5,6 +5,7 @@ const event = (function() {
 
   function isStateEvent(evt) {
     return (
+      evt === 'STATE_SET' ||
       evt === 'STATE_RESET' ||
       evt === 'STATE_REVERTED' ||
       evt === 'STATE_MODIFIED' ||
@@ -17,7 +18,7 @@ const event = (function() {
     events[evt].push(cb);
   }
   function emit(evt, ...args) {
-    if (!event[evt]) return;
+    if (!events[evt]) return;
     if (isStateEvent(evt)) {
       each(events[evt], cb => cb(currentState(), ...args));
     }
@@ -62,6 +63,7 @@ function previousState() {
 }
 function setInitialState(obj) {
   states[0] = obj;
+  event.emit('STATE_SET');
 }
 function setState(obj) {
   states.push(obj);
