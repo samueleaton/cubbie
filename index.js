@@ -1,6 +1,16 @@
 'use strict';
 
-var _lodash = require('lodash');
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+var _lodash = require('lodash.foreach');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _lodash3 = require('lodash.isArray');
+
+var _lodash4 = _interopRequireDefault(_lodash3);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var event = function () {
   var events = {};
@@ -9,7 +19,7 @@ var event = function () {
     return evt === 'STATE_SET' || evt === 'STATE_RESET' || evt === 'STATE_REVERTED' || evt === 'STATE_MODIFIED' || evt === 'STATE_PROBED';
   }
   function on(evt, cb) {
-    if (!_.isArray(events[evt])) events[evt] = [];
+    if (!(0, _lodash4.default)(events[evt])) events[evt] = [];
     events[evt].push(cb);
   }
   function emit(evt) {
@@ -19,13 +29,13 @@ var event = function () {
 
     if (!events[evt]) return;
     if (isStateEvent(evt)) {
-      (0, _lodash.each)(events[evt], function (cb) {
+      (0, _lodash2.default)(events[evt], function (cb) {
         return cb.apply(undefined, [currentState()].concat(args));
       });
     } else {
       (function () {
         var tempState = Object.assign({}, currentState());
-        (0, _lodash.each)(events[evt], function (cb) {
+        (0, _lodash2.default)(events[evt], function (cb) {
           return cb.apply(undefined, [tempState].concat(args));
         });
         setState(tempState);
@@ -36,6 +46,7 @@ var event = function () {
 }();
 
 var states = [];
+var _staticState = {};
 
 function currentState() {
   return Object.assign({}, states[states.length - 1]);
@@ -70,6 +81,15 @@ function stateHistory() {
     return x;
   });
 }
+function setStaticState(obj) {
+  if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) !== 'object') return console.error('must pass object to setStaticState');
+  (0, _lodash2.default)(Object.keys(obj), function (k) {
+    _staticState[k] = obj[k];
+  });
+}
+function staticState() {
+  return Object.assign({}, _staticState);
+}
 
 var store = {
   currentState: currentState,
@@ -79,6 +99,8 @@ var store = {
   modifyState: modifyState,
   setInitialState: setInitialState,
   stateHistory: stateHistory,
+  staticState: staticState,
+  setStaticState: setStaticState,
   on: event.on,
   emit: event.emit
 };

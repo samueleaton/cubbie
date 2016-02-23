@@ -1,4 +1,5 @@
-import { each } from 'lodash';
+import each from 'lodash.foreach';
+import isArray from 'lodash.isArray';
 
 const event = (function() {
   const events = {};
@@ -13,7 +14,7 @@ const event = (function() {
     );
   }
   function on(evt, cb) {
-    if (!_.isArray(events[evt]))
+    if (!isArray(events[evt]))
       events[evt] = [];
     events[evt].push(cb);
   }
@@ -32,6 +33,7 @@ const event = (function() {
 })();
 
 const states = [];
+const _staticState = {};
 
 function currentState() {
   return Object.assign({}, states[states.length - 1]);
@@ -71,6 +73,16 @@ function setState(obj) {
 function stateHistory() {
   return states.map(x => x);
 }
+function setStaticState(obj) {
+  if (typeof obj !== 'object')
+    return console.error('must pass object to setStaticState');
+  each(Object.keys(obj), k => {
+    _staticState[k] = obj[k];
+  });
+}
+function staticState() {
+  return Object.assign({}, _staticState);
+}
 
 const store = {
   currentState,
@@ -80,6 +92,8 @@ const store = {
   modifyState,
   setInitialState,
   stateHistory,
+  staticState,
+  setStaticState,
   on: event.on,
   emit: event.emit
 };
@@ -88,5 +102,6 @@ Object.defineProperty(store, 'state', {
   get: () => store.currentState(),
   set: (cb) => {store.modifyState(cb)}
 });
+
 
 module.exports = store;
