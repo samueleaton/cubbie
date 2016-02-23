@@ -56,15 +56,17 @@ function resetState() {
   event.emit('STATE_RESET');
 }
 function revertState(n) {
-  if (states.length > 1) states.pop();
+  if (states.length > 1) states.pop();else return false;
   // recursively revert state
   if (typeof n === 'number' && n > 1) revertState(n - 1);else event.emit('STATE_REVERTED');
+  return true;
 }
 function modifyState(func) {
   var tempState = Object.assign({}, currentState());
   func(tempState);
   setState(tempState);
   event.emit('STATE_MODIFIED');
+  return currentState();
 }
 function previousState() {
   if (states.length <= 2) return Object.assign({}, states[1]);else return Object.assign({}, states[states.length - 2]);
@@ -90,6 +92,9 @@ function setStaticState(obj) {
 function staticState() {
   return Object.assign({}, _staticState);
 }
+function probe() {
+  event.emit('STATE_PROBED');
+}
 
 var store = {
   currentState: currentState,
@@ -101,6 +106,7 @@ var store = {
   stateHistory: stateHistory,
   staticState: staticState,
   setStaticState: setStaticState,
+  probe: probe,
   on: event.on,
   emit: event.emit
 };
