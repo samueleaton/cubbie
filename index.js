@@ -10,6 +10,10 @@ var _lodash3 = require('lodash.isArray');
 
 var _lodash4 = _interopRequireDefault(_lodash3);
 
+var _lodash5 = require('lodash.clonedeep');
+
+var _lodash6 = _interopRequireDefault(_lodash5);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var event = function () {
@@ -38,7 +42,7 @@ var event = function () {
         (0, _lodash2.default)(events[evt], function (cb) {
           return cb.apply(undefined, [tempState].concat(args));
         });
-        setState(tempState);
+        setNewState(tempState);
       })();
     }
   }
@@ -62,9 +66,9 @@ function revertState(n) {
   return true;
 }
 function modifyState(func) {
-  var tempState = Object.assign({}, currentState());
+  var tempState = (0, _lodash6.default)(currentState());
   func(tempState);
-  setState(tempState);
+  setNewState(tempState);
   event.emit('STATE_MODIFIED');
   return currentState();
 }
@@ -75,7 +79,7 @@ function setInitialState(obj) {
   states[0] = obj;
   event.emit('STATE_SET');
 }
-function setState(obj) {
+function setNewState(obj) {
   states.push(obj);
 }
 function stateHistory() {

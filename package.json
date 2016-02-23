@@ -25,6 +25,7 @@
     "babel-preset-es2015": "^6.3.13"
   },
   "dependencies": {
+    "lodash.clonedeep": "^4.3.0",
     "lodash.foreach": "^4.1.0",
     "lodash.isarray": "^4.0.0"
   }

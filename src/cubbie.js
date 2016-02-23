@@ -1,5 +1,6 @@
 import each from 'lodash.foreach';
 import isArray from 'lodash.isArray';
+import cloneDeep from 'lodash.clonedeep';
 
 const event = (function() {
   const events = {};
@@ -26,7 +27,7 @@ const event = (function() {
     else {
       const tempState = Object.assign({}, currentState());
       each(events[evt], cb => cb(tempState, ...args));
-      setState(tempState);
+      setNewState(tempState);
     }
   }
   return { on, emit };
@@ -55,9 +56,9 @@ function revertState(n) {
     return true; 
 }
 function modifyState(func) {
-  const tempState = Object.assign({}, currentState());
+  const tempState = cloneDeep(currentState());
   func(tempState);
-  setState(tempState);
+  setNewState(tempState);
   event.emit('STATE_MODIFIED');
   return currentState();
 }
@@ -71,7 +72,7 @@ function setInitialState(obj) {
   states[0] = obj;
   event.emit('STATE_SET');
 }
-function setState(obj) {
+function setNewState(obj) {
   states.push(obj);
 }
 function stateHistory() {
