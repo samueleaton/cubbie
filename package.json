@@ -1,0 +1,27 @@
+{
+  "name": "cubbie",
+  "version": "0.0.1",
+  "description": "Simple state storage",
+  "main": "index.js",
+  "scripts": {
+    "transpile": "babel src/cubbie.js > index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samueleaton/cubbie.git"
+  },
+  "keywords": [
+    "state",
+    "redux"
+  ],
+  "author": "Sam Eaton",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/samueleaton/cubbie/issues"
+  },
+  "homepage": "https://github.com/samueleaton/cubbie#readme",
+  "devDependencies": {
+    "babel-cli": "^6.4.5",
+    "babel-preset-es2015": "^6.3.13"
+  }
+}

@@ -1,0 +1,3 @@
+# Cubbie
+
+Simple state storage
