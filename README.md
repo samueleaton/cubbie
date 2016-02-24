@@ -6,7 +6,7 @@ Cubbie has the same use case as Redux but is made for quicker prototyping or sma
 
 ## Usage
 
-**Simply set the initial state**
+#### Setting the initial state
 
 ``` javascript
 import store from 'cubbie';
@@ -16,7 +16,7 @@ store.setInitialState({currentPage: 'home', loggedIn: true});
 
 `setInitialState` triggers the `STATE_SET` event. See the **Events** section.
 
-**Accessing current the state**
+#### Accessing the Current State
 
 ``` javascript
 const state = store.state;
@@ -24,14 +24,15 @@ const state = store.state;
 const state = store.currentState();
 ```
 
-**Getting the state history**
+#### Getting the State History
 
 ``` javascript
 store.stateHistory();
 // returns array of all of the states in history of session
 ```
+**Note:** Reverting or resetting the state will remove states from the state history.
 
-**Modify the state**
+#### Modify the state
 
 Pass a callback where you modify the state object.
 
@@ -61,13 +62,13 @@ store.stateHistory().length; // then now its 2
 
 `modifyState` will return the new current state.
 
-**Get Previous State**
+#### Get Previous State
 
 ``` javascript
 store.previousState();
 ```
 
-**Resetting State**
+#### Resetting State
 
 This will reset the state to the initial state.
 
@@ -77,17 +78,40 @@ store.resetState();
 
 `modifyState` triggers the `STATE_RESET` event. See the **Events** section.
 
-**Revert State**
+#### Reverting State
 
-This will revert the state to the previous state.
+This will revert the state to a previous state.
+
+If nothing is passed as an argument, then the current state will be reverted to the most recent previous state:  
 
 ``` javascript
 store.revertState();
 ```
 
+A successful revert will return `true`.
+
 You can call `revertState` until you get to the initial state, then it will do nothing and return `false`. 
 
-`modifyState` triggers the `STATE_REVERTED` event. See the **Events** section.
+Passing an integer to `revertState` will revert the state *n* times:
+
+``` javascript
+store.revertState(3); // reverts the state 3 times
+
+// this will still only trigger the STATE_REVERTED event once
+```
+
+Passing a callback will allow you to revert the state back to where the callback returns true:
+
+``` javascript
+store.revertState(state => {
+  return state.page === 'HOME' && state.loggedIn === true;
+});
+
+// Reverts the state to the last time where 
+// page was 'HOME' and where loggedIn was true
+```
+
+`revertState` triggers the `STATE_REVERTED` event. See the **Events** section.
 
 ### Static State
 

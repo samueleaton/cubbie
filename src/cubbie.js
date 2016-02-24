@@ -1,6 +1,7 @@
 import each from 'lodash.foreach';
 import isArray from 'lodash.isArray';
 import cloneDeep from 'lodash.clonedeep';
+import findLastIndex from 'lodash.findlastindex';
 
 const event = (function() {
   const events = {};
@@ -44,6 +45,9 @@ function resetState() {
   event.emit('STATE_RESET');
 }
 function revertState(n) {
+  if (typeof n === 'function')
+    return revertStateWhere(n);
+
   if (states.length > 1)
     states.pop();
   else
@@ -53,7 +57,21 @@ function revertState(n) {
     revertState(n - 1);
   else
     event.emit('STATE_REVERTED');
-    return true; 
+  
+  return true; 
+}
+function revertStateWhere(cb) {
+  const _history = stateHistory();
+  const _historyLength = _history.length;
+
+  const index = findLastIndex(_history, state => {
+    if (cb(state))
+      return true;
+  });
+
+  if (index === -1) return false;
+
+  return revertState(_historyLength - (index + 1));
 }
 function modifyState(func) {
   const tempState = cloneDeep(currentState());
@@ -76,7 +94,7 @@ function setNewState(obj) {
   states.push(obj);
 }
 function stateHistory() {
-  return states.map(x => x);
+  return states.map(x => cloneDeep(x));
 }
 function setStaticState(obj) {
   if (typeof obj !== 'object')

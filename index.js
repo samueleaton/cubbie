@@ -14,6 +14,10 @@ var _lodash5 = require('lodash.clonedeep');
 
 var _lodash6 = _interopRequireDefault(_lodash5);
 
+var _lodash7 = require('lodash.findlastindex');
+
+var _lodash8 = _interopRequireDefault(_lodash7);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var event = function () {
@@ -60,10 +64,25 @@ function resetState() {
   event.emit('STATE_RESET');
 }
 function revertState(n) {
+  if (typeof n === 'function') return revertStateWhere(n);
+
   if (states.length > 1) states.pop();else return false;
   // recursively revert state
   if (typeof n === 'number' && n > 1) revertState(n - 1);else event.emit('STATE_REVERTED');
+
   return true;
+}
+function revertStateWhere(cb) {
+  var _history = stateHistory();
+  var _historyLength = _history.length;
+
+  var index = (0, _lodash8.default)(_history, function (state) {
+    if (cb(state)) return true;
+  });
+
+  if (index === -1) return false;
+
+  return revertState(_historyLength - (index + 1));
 }
 function modifyState(func) {
   var tempState = (0, _lodash6.default)(currentState());
@@ -84,7 +103,7 @@ function setNewState(obj) {
 }
 function stateHistory() {
   return states.map(function (x) {
-    return x;
+    return (0, _lodash6.default)(x);
   });
 }
 function setStaticState(obj) {
