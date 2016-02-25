@@ -1105,19 +1105,39 @@ store.stateHistory().length; // then now its 2
 </code></pre>
 
 <h3 id="events"><a name="user-content-events" href="#events" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Events</h3>
-<p>Adding event listeners:</p>
+<p><strong>Adding Event Listeners</strong></p>
 <pre><code class="javascript">store.on('EVENT_NAME', () =&gt; {
     // callback
 });
 </code></pre>
 
-<p>Emitting events:</p>
+<p>A single listener can be attached to mutliple events by passing the events names as an array. So, for example, to add a listener for all of the &ldquo;State Events&rdquo; (Built-in Events) you can do the following:</p>
+<pre><code class="javascript">store.on(store.stateEvents, () =&gt; {
+  // code here...
+})
+</code></pre>
+
+<p>&hellip; same as&hellip;</p>
+<pre><code class="javascript">store.on([
+    &quot;STATE_SET&quot;,
+    &quot;STATE_RESET&quot;,
+    &quot;STATE_REVERTED&quot;,
+    &quot;STATE_MODIFIED&quot;,
+    &quot;STATE_PROBED&quot;
+  ],
+  () =&gt; {
+    // code here...
+  }
+)
+</code></pre>
+
+<p><strong>Emitting Events</strong></p>
 <pre><code class="javascript">store.emit('EVENT_NAME' [, optional_args]);
 </code></pre>
 
 <p>Arguments passed to the emitter will be passed as parameters to the event handler. </p>
 <p><strong>Built-in Events</strong></p>
-<p>Custom events can be added and emitted, but there are 5 built-in events. </p>
+<p>Custom events can be added and emitted, but there are 5 built-in <em>State Events</em>. </p>
 <ul>
 <li><code>STATE_SET</code> - Triggered on <code>store.setInitialState({});</code></li>
 <li><code>STATE_RESET</code> - Triggered on <code>store.resetState();</code></li>
@@ -1125,4 +1145,5 @@ store.stateHistory().length; // then now its 2
 <li><code>STATE_REVERTED</code> - Triggered on <code>store.revertState();</code></li>
 <li><code>STATE_PROBED</code> - Triggered on <code>store.probeState();</code></li>
 </ul>
-<p>The whole purpose of <code>probeState()</code> is to trigger the <code>STATE_PROBED</code> event.</p></article></body></html>
+<p>The whole purpose of <code>probeState()</code> is to trigger the <code>STATE_PROBED</code> event.</p>
+<p>To get an array of all state events, access the <code>stateEvents</code> property.</p></article></body></html>

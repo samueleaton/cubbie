@@ -6,32 +6,48 @@ import findLastIndex from 'lodash.findlastindex';
 const event = (function() {
   const events = {};
 
+  const stateEvents = [
+    'STATE_SET',
+    'STATE_RESET',
+    'STATE_REVERTED',
+    'STATE_MODIFIED',
+    'STATE_PROBED'
+  ];
+
   function isStateEvent(evt) {
-    return (
-      evt === 'STATE_SET' ||
-      evt === 'STATE_RESET' ||
-      evt === 'STATE_REVERTED' ||
-      evt === 'STATE_MODIFIED' ||
-      evt === 'STATE_PROBED'
-    );
+    return stateEvents.indexOf(evt) !== -1;
   }
-  function on(evt, cb) {
-    if (!isArray(events[evt]))
-      events[evt] = [];
-    events[evt].push(cb);
+  function on(arg, cb) {
+    const args = isArray(arg) ? arg : [ arg ] ;
+    if (typeof cb !== 'function')
+      return console.error('last param to "on" must be a function');
+    each(args, evt => {
+      if (!isArray(events[evt]))
+        events[evt] = [];
+      events[evt].push(cb);
+    });
+    return store;
   }
   function emit(evt, ...args) {
-    if (!events[evt]) return;
     if (isStateEvent(evt)) {
+      console.log('emit state event: ', evt);
       each(events[evt], cb => cb(currentState(), ...args));
+      // emit('ANY_STATE_CHANGE');
     }
+    else if (!events[evt])
+      return store;
     else {
       const tempState = Object.assign({}, currentState());
       each(events[evt], cb => cb(tempState, ...args));
       setNewState(tempState);
+      return store;
     }
   }
-  return { on, emit };
+  return {
+    on,
+    emit,
+    stateEvents: () => stateEvents.map(x => x)
+  };
 })();
 
 const states = [];
@@ -130,5 +146,8 @@ Object.defineProperty(store, 'state', {
   set: (cb) => {store.modifyState(cb)}
 });
 
+Object.defineProperty(store, 'stateEvents', {
+  get: () => event.stateEvents(),
+});
 
 module.exports = store;

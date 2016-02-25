@@ -133,7 +133,7 @@ store.staticState();
 
 ### Events
 
-Adding event listeners:
+**Adding Event Listeners**
 
 ``` javascript
 store.on('EVENT_NAME', () => {
@@ -141,7 +141,31 @@ store.on('EVENT_NAME', () => {
 });
 ```
 
-Emitting events:
+A single listener can be attached to mutliple events by passing the events names as an array. So, for example, to add a listener for all of the "State Events" (Built-in Events) you can do the following:
+
+``` javascript
+store.on(store.stateEvents, () => {
+  // code here...
+})
+```
+
+... same as...
+
+``` javascript
+store.on([
+    "STATE_SET",
+    "STATE_RESET",
+    "STATE_REVERTED",
+    "STATE_MODIFIED",
+    "STATE_PROBED"
+  ],
+  () => {
+    // code here...
+  }
+)
+```
+
+**Emitting Events**
 
 ``` javascript
 store.emit('EVENT_NAME' [, optional_args]);
@@ -151,7 +175,7 @@ Arguments passed to the emitter will be passed as parameters to the event handle
 
 **Built-in Events**
 
-Custom events can be added and emitted, but there are 5 built-in events. 
+Custom events can be added and emitted, but there are 5 built-in *State Events*. 
 
 - `STATE_SET` - Triggered on `store.setInitialState({});`
 - `STATE_RESET` - Triggered on `store.resetState();`
@@ -160,4 +184,6 @@ Custom events can be added and emitted, but there are 5 built-in events.
 - `STATE_PROBED` - Triggered on `store.probeState();`
 
 The whole purpose of `probeState()` is to trigger the `STATE_PROBED` event.
+
+To get an array of all state events, access the `stateEvents` property.
 

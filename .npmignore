@@ -3,3 +3,5 @@ node_modules
 .DS_Store
 test.js
 test.*.js
+demo.*
+demo.*.js

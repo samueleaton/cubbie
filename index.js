@@ -23,34 +23,55 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var event = function () {
   var events = {};
 
+  var _stateEvents = ['STATE_SET', 'STATE_RESET', 'STATE_REVERTED', 'STATE_MODIFIED', 'STATE_PROBED'];
+
   function isStateEvent(evt) {
-    return evt === 'STATE_SET' || evt === 'STATE_RESET' || evt === 'STATE_REVERTED' || evt === 'STATE_MODIFIED' || evt === 'STATE_PROBED';
+    return _stateEvents.indexOf(evt) !== -1;
   }
-  function on(evt, cb) {
-    if (!(0, _lodash4.default)(events[evt])) events[evt] = [];
-    events[evt].push(cb);
+  function on(arg, cb) {
+    var args = (0, _lodash4.default)(arg) ? arg : [arg];
+    if (typeof cb !== 'function') return console.error('last param to "on" must be a function');
+    (0, _lodash2.default)(args, function (evt) {
+      if (!(0, _lodash4.default)(events[evt])) events[evt] = [];
+      events[evt].push(cb);
+    });
+    return store;
   }
   function emit(evt) {
     for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
       args[_key - 1] = arguments[_key];
     }
 
-    if (!events[evt]) return;
     if (isStateEvent(evt)) {
+      console.log('emit state event: ', evt);
       (0, _lodash2.default)(events[evt], function (cb) {
         return cb.apply(undefined, [currentState()].concat(args));
       });
-    } else {
-      (function () {
-        var tempState = Object.assign({}, currentState());
-        (0, _lodash2.default)(events[evt], function (cb) {
-          return cb.apply(undefined, [tempState].concat(args));
-        });
-        setNewState(tempState);
-      })();
-    }
+      // emit('ANY_STATE_CHANGE');
+    } else if (!events[evt]) return store;else {
+        var _ret = function () {
+          var tempState = Object.assign({}, currentState());
+          (0, _lodash2.default)(events[evt], function (cb) {
+            return cb.apply(undefined, [tempState].concat(args));
+          });
+          setNewState(tempState);
+          return {
+            v: store
+          };
+        }();
+
+        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+      }
   }
-  return { on: on, emit: emit };
+  return {
+    on: on,
+    emit: emit,
+    stateEvents: function stateEvents() {
+      return _stateEvents.map(function (x) {
+        return x;
+      });
+    }
+  };
 }();
 
 var states = [];
@@ -140,6 +161,12 @@ Object.defineProperty(store, 'state', {
   },
   set: function set(cb) {
     store.modifyState(cb);
+  }
+});
+
+Object.defineProperty(store, 'stateEvents', {
+  get: function get() {
+    return event.stateEvents();
   }
 });
 
