@@ -6,7 +6,7 @@ cubbie.on('STATE_SET', () => {
   console.log('State Set.');
 });
 
-cubbie.setInitialState({
+cubbie.initialState = {
   people: [
     {name: "Sam", age: 25},
     {name: "Jasmine", age: 22},
@@ -14,5 +14,5 @@ cubbie.setInitialState({
   ],
   currentPerson: "Sam",
   currentPanel: 'HOME'
-});
+};
 

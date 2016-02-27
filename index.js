@@ -43,25 +43,23 @@ var event = function () {
     }
 
     if (isStateEvent(evt)) {
-      console.log('emit state event: ', evt);
       (0, _lodash2.default)(events[evt], function (cb) {
         return cb.apply(undefined, [currentState()].concat(args));
       });
-      // emit('ANY_STATE_CHANGE');
     } else if (!events[evt]) return store;else {
-        var _ret = function () {
-          var tempState = Object.assign({}, currentState());
-          (0, _lodash2.default)(events[evt], function (cb) {
-            return cb.apply(undefined, [tempState].concat(args));
-          });
-          setNewState(tempState);
-          return {
-            v: store
-          };
-        }();
+      var _ret = function () {
+        var tempState = Object.assign({}, currentState());
+        (0, _lodash2.default)(events[evt], function (cb) {
+          return cb.apply(undefined, [tempState].concat(args));
+        });
+        setNewState(tempState);
+        return {
+          v: store
+        };
+      }();
 
-        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-      }
+      if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+    }
   }
   return {
     on: on,
@@ -115,6 +113,9 @@ function modifyState(func) {
 function previousState() {
   if (states.length <= 2) return Object.assign({}, states[1]);else return Object.assign({}, states[states.length - 2]);
 }
+function getInitialState(obj) {
+  return (0, _lodash6.default)(states[0]);
+}
 function setInitialState(obj) {
   states[0] = obj;
   event.emit('STATE_SET');
@@ -141,15 +142,10 @@ function probe() {
 }
 
 var store = {
-  currentState: currentState,
-  previousState: previousState,
   resetState: resetState,
   revertState: revertState,
   modifyState: modifyState,
   setInitialState: setInitialState,
-  stateHistory: stateHistory,
-  staticState: staticState,
-  setStaticState: setStaticState,
   probe: probe,
   on: event.on,
   emit: event.emit
@@ -157,16 +153,43 @@ var store = {
 
 Object.defineProperty(store, 'state', {
   get: function get() {
-    return store.currentState();
+    return currentState();
+  }
+});
+
+Object.defineProperty(store, 'staticState', {
+  get: function get() {
+    return staticState();
   },
-  set: function set(cb) {
-    store.modifyState(cb);
+  set: function set(obj) {
+    setStaticState(obj);
   }
 });
 
 Object.defineProperty(store, 'stateEvents', {
   get: function get() {
     return event.stateEvents();
+  }
+});
+
+Object.defineProperty(store, 'previousState', {
+  get: function get() {
+    return previousState();
+  }
+});
+
+Object.defineProperty(store, 'initialState', {
+  get: function get() {
+    return getInitialState();
+  },
+  set: function set(obj) {
+    return setInitialState(obj);
+  }
+});
+
+Object.defineProperty(store, 'stateHistory', {
+  get: function get() {
+    return stateHistory();
   }
 });
 

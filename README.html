@@ -1017,26 +1017,39 @@ body .markdown-body
 </style><title>README</title></head><body><article class="markdown-body"><h1 id="cubbie"><a name="user-content-cubbie" href="#cubbie" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Cubbie</h1>
 <p>Simple state storage</p>
 <p>Cubbie has the same use case as Redux but is made for quicker prototyping or smaller apps. Cubbie has less boilerplate. </p>
+<h2 id="installation"><a name="user-content-installation" href="#installation" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Installation</h2>
+<pre><code>npm i -S cubbie
+</code></pre>
+
 <h2 id="usage"><a name="user-content-usage" href="#usage" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Usage</h2>
-<h4 id="setting-the-initial-state"><a name="user-content-setting-the-initial-state" href="#setting-the-initial-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Setting the initial state</h4>
-<pre><code class="javascript">import store from 'cubbie';
-
-store.setInitialState({currentPage: 'home', loggedIn: true});
+<p>Obviously, you need to require the library into your project:</p>
+<pre><code class="javascript">import store from 'cubbie'; // es2015
+// or 
+const store = require('cubbie');
 </code></pre>
 
-<p><code>setInitialState</code> triggers the <code>STATE_SET</code> event. See the <strong>Events</strong> section.</p>
-<h4 id="accessing-the-current-state"><a name="user-content-accessing-the-current-state" href="#accessing-the-current-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Accessing the Current State</h4>
-<pre><code class="javascript">const state = store.state;
-// or
-const state = store.currentState();
+<h3 id="initial-state"><a name="user-content-initial-state" href="#initial-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Initial State</h3>
+<p>Before you can start tracking state, you need to set an initial state:</p>
+<pre><code class="javascript">store.initialState = {currentPage: 'home', loggedIn: true, etc: '...'};
 </code></pre>
 
-<h4 id="getting-the-state-history"><a name="user-content-getting-the-state-history" href="#getting-the-state-history" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Getting the State History</h4>
-<p><pre><code class="javascript">store.stateHistory();
-// returns array of all of the states in history of session
-</code></pre><br />
-<strong>Note:</strong> Reverting or resetting the state will remove states from the state history.</p>
-<h4 id="modify-the-state"><a name="user-content-modify-the-state" href="#modify-the-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Modify the state</h4>
+<p><code>initialState</code> triggers the <code>STATE_SET</code> event. See the <strong>Events</strong> section.</p>
+<p>To get the initial state:</p>
+<pre><code class="javascript">store.initialState;
+</code></pre>
+
+<h3 id="current-state"><a name="user-content-current-state" href="#current-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Current State</h3>
+<pre><code class="javascript">store.state;
+</code></pre>
+
+<p>The you can also access the current state by getting the last element in the array returned from <code>store.stateHistory</code>.</p>
+<h3 id="state-history"><a name="user-content-state-history" href="#state-history" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>State History</h3>
+<p>Returns array of all of the states in history since the initial state.</p>
+<pre><code class="javascript">store.stateHistory;
+</code></pre>
+
+<p><strong>Note:</strong> Reverting or resetting the state will remove states from the state history. Modifying the state will append a new state to the state history.</p>
+<h3 id="modify-the-state"><a name="user-content-modify-the-state" href="#modify-the-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Modify the state</h3>
 <p>Pass a callback where you modify the state object.</p>
 <pre><code class="javascript">store.modifyState(state =&gt; {
     state.x = y;
@@ -1045,45 +1058,50 @@ const state = store.currentState();
 });
 </code></pre>
 
-<p>This is an immutable operation and the state object will be added as the new state.</p>
-<pre><code class="javascript">store.stateHistory().length; // lets say its 1
+<p>This is an immutable operation and the newly modified state object will be added as the new state to the state history.</p>
+<p>Example</p>
+<pre><code class="javascript">store.stateHistory.length; // lets say its 1
 
-const state = store.modifyState(state =&gt; {
+store.modifyState(state =&gt; {
     state.x = y;
     state.z = 11;
     // etc.
 });
 
-store.stateHistory().length; // then now its 2
+store.stateHistory.length; // then now its 2
 </code></pre>
 
 <p><code>modifyState</code> triggers the <code>STATE_MODIFIED</code> event. See the <strong>Events</strong> section.</p>
 <p><code>modifyState</code> will return the new current state.</p>
-<h4 id="get-previous-state"><a name="user-content-get-previous-state" href="#get-previous-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Get Previous State</h4>
-<pre><code class="javascript">store.previousState();
+<h3 id="get-previous-state"><a name="user-content-get-previous-state" href="#get-previous-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Get Previous State</h3>
+<pre><code class="javascript">store.previousState;
 </code></pre>
 
-<h4 id="resetting-state"><a name="user-content-resetting-state" href="#resetting-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Resetting State</h4>
+<h3 id="resetting-state"><a name="user-content-resetting-state" href="#resetting-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Resetting State</h3>
 <p>This will reset the state to the initial state.</p>
 <pre><code class="javascript">store.resetState();
 </code></pre>
 
 <p><code>modifyState</code> triggers the <code>STATE_RESET</code> event. See the <strong>Events</strong> section.</p>
-<h4 id="reverting-state"><a name="user-content-reverting-state" href="#reverting-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Reverting State</h4>
+<h3 id="reverting-state"><a name="user-content-reverting-state" href="#reverting-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Reverting State</h3>
 <p>This will revert the state to a previous state.</p>
+<p><strong>With No Arguments</strong></p>
 <p>If nothing is passed as an argument, then the current state will be reverted to the most recent previous state:  </p>
 <pre><code class="javascript">store.revertState();
 </code></pre>
 
 <p>A successful revert will return <code>true</code>.</p>
 <p>You can call <code>revertState</code> until you get to the initial state, then it will do nothing and return <code>false</code>. </p>
+<p><strong>Reverting <em>n</em> Time</strong></p>
 <p>Passing an integer to <code>revertState</code> will revert the state <em>n</em> times:</p>
 <pre><code class="javascript">store.revertState(3); // reverts the state 3 times
-
-// this will still only trigger the STATE_REVERTED event once
 </code></pre>
 
-<p>Passing a callback will allow you to revert the state back to where the callback returns true:</p>
+<p>Passing an integer to <code>revertState</code> will still only trigger the STATE_REVERTED event once, after it has finished reverting <em>n</em> times.</p>
+<p>Thus, <code>store.revertState(1)</code> and <code>store.revertState()</code> are virtually equivalent.</p>
+<p><strong>Conditional Revert</strong></p>
+<p>This is definitely the more powerful way to revert the state. You can revert to the most recent state that meets a certain criteria.</p>
+<p>Passing a function will iterate over each state, starting with the current state and ending with the initial state, and will revert to the state where the function returns <code>true</code>:</p>
 <pre><code class="javascript">store.revertState(state =&gt; {
   return state.page === 'HOME' &amp;&amp; state.loggedIn === true;
 });
@@ -1097,11 +1115,11 @@ store.stateHistory().length; // then now its 2
 <p>Internally, static state is a totally separate object from the normal state. It is meant to be set from the beginning of the app and it cannot be changed, unless you totally reset it.</p>
 <p>The purpose is to store information that shouldn&rsquo;t need to be changed, such as URLs, file paths, config information, etc. </p>
 <p><strong>Setting Static State</strong></p>
-<pre><code class="javascript">store.setStaticState({x: 11, y: 'yee'});
+<pre><code class="javascript">store.staticState = {x: 11, y: 'yee'};
 </code></pre>
 
 <p><strong>Accessing Static State</strong></p>
-<pre><code class="javascript">store.staticState();
+<pre><code class="javascript">store.staticState;
 </code></pre>
 
 <h3 id="events"><a name="user-content-events" href="#events" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Events</h3>
@@ -1111,14 +1129,9 @@ store.stateHistory().length; // then now its 2
 });
 </code></pre>
 
-<p>A single listener can be attached to mutliple events by passing the events names as an array. So, for example, to add a listener for all of the &ldquo;State Events&rdquo; (Built-in Events) you can do the following:</p>
-<pre><code class="javascript">store.on(store.stateEvents, () =&gt; {
-  // code here...
-})
-</code></pre>
-
-<p>&hellip; same as&hellip;</p>
-<pre><code class="javascript">store.on([
+<p>A single listener can be attached to multiple events by passing the events names as an array. So, for example, to add a listener for all of the &ldquo;State Events&rdquo; (Built-in Events) you can do the following:</p>
+<pre><code class="javascript">store.on(
+  [
     &quot;STATE_SET&quot;,
     &quot;STATE_RESET&quot;,
     &quot;STATE_REVERTED&quot;,
@@ -1131,6 +1144,12 @@ store.stateHistory().length; // then now its 2
 )
 </code></pre>
 
+<p>But because you can ge an array of all state events using <code>store.stateEvents</code> you could shorten the above code to:</p>
+<pre><code class="javascript">store.on(store.stateEvents, () =&gt; {
+  // code here...
+})
+</code></pre>
+
 <p><strong>Emitting Events</strong></p>
 <pre><code class="javascript">store.emit('EVENT_NAME' [, optional_args]);
 </code></pre>
@@ -1139,11 +1158,11 @@ store.stateHistory().length; // then now its 2
 <p><strong>Built-in Events</strong></p>
 <p>Custom events can be added and emitted, but there are 5 built-in <em>State Events</em>. </p>
 <ul>
-<li><code>STATE_SET</code> - Triggered on <code>store.setInitialState({});</code></li>
+<li><code>STATE_SET</code> - Triggered on <code>store.initialState = {};</code></li>
 <li><code>STATE_RESET</code> - Triggered on <code>store.resetState();</code></li>
 <li><code>STATE_MODIFIED</code> - Triggered on <code>store.modifiyState(() =&gt; {});</code></li>
 <li><code>STATE_REVERTED</code> - Triggered on <code>store.revertState();</code></li>
 <li><code>STATE_PROBED</code> - Triggered on <code>store.probeState();</code></li>
 </ul>
-<p>The whole purpose of <code>probeState()</code> is to trigger the <code>STATE_PROBED</code> event.</p>
+<p>The only purpose of <code>probeState()</code> is to trigger the <code>STATE_PROBED</code> event.</p>
 <p>To get an array of all state events, access the <code>stateEvents</code> property.</p></article></body></html>

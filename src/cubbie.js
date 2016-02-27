@@ -30,9 +30,7 @@ const event = (function() {
   }
   function emit(evt, ...args) {
     if (isStateEvent(evt)) {
-      console.log('emit state event: ', evt);
       each(events[evt], cb => cb(currentState(), ...args));
-      // emit('ANY_STATE_CHANGE');
     }
     else if (!events[evt])
       return store;
@@ -102,6 +100,9 @@ function previousState() {
   else
     return Object.assign({}, states[states.length - 2]);
 }
+function getInitialState(obj) {
+  return cloneDeep(states[0]);
+}
 function setInitialState(obj) {
   states[0] = obj;
   event.emit('STATE_SET');
@@ -127,27 +128,39 @@ function probe() {
 }
 
 const store = {
-  currentState,
-  previousState,
   resetState,
   revertState,
   modifyState,
   setInitialState,
-  stateHistory,
-  staticState,
-  setStaticState,
   probe,
   on: event.on,
   emit: event.emit
 };
 
 Object.defineProperty(store, 'state', {
-  get: () => store.currentState(),
-  set: (cb) => {store.modifyState(cb)}
+  get: () => currentState()
+});
+
+Object.defineProperty(store, 'staticState', {
+  get: () => staticState(),
+  set: (obj) => {setStaticState(obj)}
 });
 
 Object.defineProperty(store, 'stateEvents', {
   get: () => event.stateEvents(),
+});
+
+Object.defineProperty(store, 'previousState', {
+  get: () => previousState(),
+});
+
+Object.defineProperty(store, 'initialState', {
+  get: () => getInitialState(),
+  set: (obj) => setInitialState(obj)
+});
+
+Object.defineProperty(store, 'stateHistory', {
+  get: () => stateHistory(),
 });
 
 module.exports = store;
