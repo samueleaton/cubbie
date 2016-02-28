@@ -47,18 +47,10 @@ var event = function () {
         return cb.apply(undefined, [currentState()].concat(args));
       });
     } else if (!events[evt]) return store;else {
-      var _ret = function () {
-        var tempState = Object.assign({}, currentState());
-        (0, _lodash2.default)(events[evt], function (cb) {
-          return cb.apply(undefined, [tempState].concat(args));
-        });
-        setNewState(tempState);
-        return {
-          v: store
-        };
-      }();
-
-      if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+      (0, _lodash2.default)(events[evt], function (cb) {
+        return cb.apply(undefined, args);
+      });
+      return store;
     }
   }
   return {

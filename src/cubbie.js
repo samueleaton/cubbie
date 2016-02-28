@@ -35,9 +35,7 @@ const event = (function() {
     else if (!events[evt])
       return store;
     else {
-      const tempState = Object.assign({}, currentState());
-      each(events[evt], cb => cb(tempState, ...args));
-      setNewState(tempState);
+      each(events[evt], cb => cb(...args));
       return store;
     }
   }
