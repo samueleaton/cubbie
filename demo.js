@@ -12,7 +12,11 @@ cubbie.initialState = {
     {name: "Jasmine", age: 22},
     {name: "Nick", age: 21}
   ],
-  currentPerson: "Sam",
+  animal: {
+  	info: [null]
+  },
+  currentPerson: {name: "Sam", age: 25},
   currentPanel: 'HOME'
 };
+
 

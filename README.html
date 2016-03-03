@@ -1028,7 +1028,7 @@ body .markdown-body
 const store = require('cubbie');
 </code></pre>
 
-<h3 id="initial-state"><a name="user-content-initial-state" href="#initial-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Initial State</h3>
+<h4 id="initial-state"><a name="user-content-initial-state" href="#initial-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Initial State</h4>
 <p>Before you can start tracking state, you need to set an initial state:</p>
 <pre><code class="javascript">store.initialState = {currentPage: 'home', loggedIn: true, etc: '...'};
 </code></pre>
@@ -1038,18 +1038,18 @@ const store = require('cubbie');
 <pre><code class="javascript">store.initialState;
 </code></pre>
 
-<h3 id="current-state"><a name="user-content-current-state" href="#current-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Current State</h3>
+<h4 id="current-state"><a name="user-content-current-state" href="#current-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Current State</h4>
 <pre><code class="javascript">store.state;
 </code></pre>
 
 <p>The you can also access the current state by getting the last element in the array returned from <code>store.stateHistory</code>.</p>
-<h3 id="state-history"><a name="user-content-state-history" href="#state-history" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>State History</h3>
+<h4 id="state-history"><a name="user-content-state-history" href="#state-history" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>State History</h4>
 <p>Returns array of all of the states in history since the initial state.</p>
 <pre><code class="javascript">store.stateHistory;
 </code></pre>
 
 <p><strong>Note:</strong> Reverting or resetting the state will remove states from the state history. Modifying the state will append a new state to the state history.</p>
-<h3 id="modify-the-state"><a name="user-content-modify-the-state" href="#modify-the-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Modify the state</h3>
+<h4 id="modifying-state"><a name="user-content-modifying-state" href="#modifying-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Modifying State</h4>
 <p>Pass a callback where you modify the state object.</p>
 <pre><code class="javascript">store.modifyState(state =&gt; {
     state.x = y;
@@ -1073,17 +1073,17 @@ store.stateHistory.length; // then now its 2
 
 <p><code>modifyState</code> triggers the <code>STATE_MODIFIED</code> event. See the <strong>Events</strong> section.</p>
 <p><code>modifyState</code> will return the new current state.</p>
-<h3 id="get-previous-state"><a name="user-content-get-previous-state" href="#get-previous-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Get Previous State</h3>
+<h4 id="get-previous-state"><a name="user-content-get-previous-state" href="#get-previous-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Get Previous State</h4>
 <pre><code class="javascript">store.previousState;
 </code></pre>
 
-<h3 id="resetting-state"><a name="user-content-resetting-state" href="#resetting-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Resetting State</h3>
+<h4 id="resetting-state"><a name="user-content-resetting-state" href="#resetting-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Resetting State</h4>
 <p>This will reset the state to the initial state.</p>
 <pre><code class="javascript">store.resetState();
 </code></pre>
 
 <p><code>modifyState</code> triggers the <code>STATE_RESET</code> event. See the <strong>Events</strong> section.</p>
-<h3 id="reverting-state"><a name="user-content-reverting-state" href="#reverting-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Reverting State</h3>
+<h4 id="reverting-state"><a name="user-content-reverting-state" href="#reverting-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Reverting State</h4>
 <p>This will revert the state to a previous state.</p>
 <p><strong>With No Arguments</strong></p>
 <p>If nothing is passed as an argument, then the current state will be reverted to the most recent previous state:  </p>
@@ -1111,7 +1111,54 @@ store.stateHistory.length; // then now its 2
 </code></pre>
 
 <p><code>revertState</code> triggers the <code>STATE_REVERTED</code> event. See the <strong>Events</strong> section.</p>
-<h3 id="static-state"><a name="user-content-static-state" href="#static-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Static State</h3>
+<h4 id="freezing-state-structure"><a name="user-content-freezing-state-structure" href="#freezing-state-structure" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Freezing State Structure</h4>
+<p>The <code>freeze</code> method will prevent:</p>
+<ul>
+<li>Adding properties to the state</li>
+<li>Removing properties from the state</li>
+<li>Converting object or array to another type</li>
+</ul>
+<p>Example</p>
+<pre><code class="javascript">store.setInitialState({
+  people: [{name: 'sam', age: 25}],
+  currentPerson: {name: 'sam', age: 25}
+});
+
+store.freeze();
+
+store.modifyState(state =&gt; {
+  state.company = &quot;Qualtrics&quot;;
+}); // aborts, cannot add property to frozen state
+
+store.modifyState(state =&gt; {
+  state.people = null;
+}); // aborts, cannot convert array to a non-array or non-object
+
+store.modifyState(state =&gt; {
+  state.currentPerson.favoriteColor = null;
+}); // aborts, cannot add property to frozen state
+</code></pre>
+
+<p>Example </p>
+<pre><code>store.setInitialState({
+  people: [{name: 'sam', age: 25}],
+  currentPerson: {name: 'sam', age: 25}
+}).freeze();
+
+/*
+  THESE STILL WORK SUCCESSFULLY
+*/
+
+store.modifyState(state =&gt; {
+  state.people.push({name: 'mike', age: 32})
+});
+
+store.modifyState(state =&gt; {
+  state.people.currentPerson = {name: 'Jack', age: 24};
+});
+</code></pre>
+
+<h4 id="static-state"><a name="user-content-static-state" href="#static-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Static State</h4>
 <p>Internally, static state is a totally separate object from the normal state. It is meant to be set from the beginning of the app and it cannot be changed, unless you totally reset it.</p>
 <p>The purpose is to store information that shouldn&rsquo;t need to be changed, such as URLs, file paths, config information, etc. </p>
 <p><strong>Setting Static State</strong></p>
@@ -1122,7 +1169,7 @@ store.stateHistory.length; // then now its 2
 <pre><code class="javascript">store.staticState;
 </code></pre>
 
-<h3 id="events"><a name="user-content-events" href="#events" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Events</h3>
+<h4 id="events"><a name="user-content-events" href="#events" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Events</h4>
 <p><strong>Adding Event Listeners</strong></p>
 <pre><code class="javascript">store.on('EVENT_NAME', () =&gt; {
     // callback

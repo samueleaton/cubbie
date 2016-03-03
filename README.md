@@ -20,7 +20,7 @@ import store from 'cubbie'; // es2015
 const store = require('cubbie');
 ```
 
-### Initial State
+#### Initial State
 
 Before you can start tracking state, you need to set an initial state:
 
@@ -36,7 +36,7 @@ To get the initial state:
 store.initialState;
 ```
 
-### Current State
+#### Current State
 
 ``` javascript
 store.state;
@@ -44,7 +44,7 @@ store.state;
 
 The you can also access the current state by getting the last element in the array returned from `store.stateHistory`.
 
-### State History
+#### State History
 
 Returns array of all of the states in history since the initial state.
 
@@ -54,7 +54,7 @@ store.stateHistory;
 
 **Note:** Reverting or resetting the state will remove states from the state history. Modifying the state will append a new state to the state history.
 
-### Modify the state
+#### Modifying State
 
 Pass a callback where you modify the state object.
 
@@ -86,13 +86,13 @@ store.stateHistory.length; // then now its 2
 
 `modifyState` will return the new current state.
 
-### Get Previous State
+#### Get Previous State
 
 ``` javascript
 store.previousState;
 ```
 
-### Resetting State
+#### Resetting State
 
 This will reset the state to the initial state.
 
@@ -102,7 +102,7 @@ store.resetState();
 
 `modifyState` triggers the `STATE_RESET` event. See the **Events** section.
 
-### Reverting State
+#### Reverting State
 
 This will revert the state to a previous state.
 
@@ -147,7 +147,60 @@ store.revertState(state => {
 
 `revertState` triggers the `STATE_REVERTED` event. See the **Events** section.
 
-### Static State
+#### Freezing State Structure
+
+The `freeze` method will prevent:
+
+- Adding properties to the state
+- Removing properties from the state
+- Converting object or array to another type
+
+Example
+
+``` javascript
+store.setInitialState({
+  people: [{name: 'sam', age: 25}],
+  currentPerson: {name: 'sam', age: 25}
+});
+
+store.freeze();
+
+store.modifyState(state => {
+  state.company = "Qualtrics";
+}); // aborts, cannot add property to frozen state
+
+store.modifyState(state => {
+  state.people = null;
+}); // aborts, cannot convert array to a non-array or non-object
+
+store.modifyState(state => {
+  state.currentPerson.favoriteColor = null;
+}); // aborts, cannot add property to frozen state
+```
+
+Example 
+
+```
+store.setInitialState({
+  people: [{name: 'sam', age: 25}],
+  currentPerson: {name: 'sam', age: 25}
+}).freeze();
+
+/*
+  THESE STILL WORK SUCCESSFULLY
+*/
+
+store.modifyState(state => {
+  state.people.push({name: 'mike', age: 32})
+});
+
+store.modifyState(state => {
+  state.people.currentPerson = {name: 'Jack', age: 24};
+});
+```
+
+
+#### Static State
 
 Internally, static state is a totally separate object from the normal state. It is meant to be set from the beginning of the app and it cannot be changed, unless you totally reset it.
 
@@ -165,7 +218,7 @@ store.staticState = {x: 11, y: 'yee'};
 store.staticState;
 ```
 
-### Events
+#### Events
 
 **Adding Event Listeners**
 
