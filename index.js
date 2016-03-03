@@ -197,7 +197,7 @@ var store = function () {
   }
 
   /**/
-  function staticState() {
+  function getStaticState() {
     return Object.assign({}, staticStateObj);
   }
 
@@ -277,10 +277,14 @@ var store = function () {
 
   return {
     currentState: currentState,
+    previousState: previousState,
     resetState: resetState,
     revertState: revertState,
     modifyState: modifyState,
+    getInitialState: getInitialState,
     setInitialState: setInitialState,
+    getStaticState: getStaticState,
+    setStaticState: setStaticState,
     probe: probe,
     freeze: freeze
   };
@@ -307,7 +311,7 @@ Object.defineProperty(cubbie, 'state', {
 
 Object.defineProperty(cubbie, 'staticState', {
   get: function get() {
-    return store.staticState();
+    return store.getStaticState();
   },
   set: function set(obj) {
     return store.setStaticState(obj);
