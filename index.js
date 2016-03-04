@@ -285,6 +285,7 @@ var store = function () {
     setInitialState: setInitialState,
     getStaticState: getStaticState,
     setStaticState: setStaticState,
+    stateHistory: stateHistory,
     probe: probe,
     freeze: freeze
   };

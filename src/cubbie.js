@@ -271,6 +271,7 @@ const store = (function() {
     setInitialState,
     getStaticState,
     setStaticState,
+    stateHistory,
     probe,
     freeze
   };
