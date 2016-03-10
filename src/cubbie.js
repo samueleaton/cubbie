@@ -106,8 +106,8 @@ class CubbieDescription {
     if (!_.isPlainObject(obj)) {
       console.error('Must pass object to "describe"');
     }
-    if (!obj.type && !obj.types) {
-      console.error('Must specify type or types with "describe"');
+    if (!obj.type && !obj.types && !obj.values) {
+      console.error('Must specify type, types, or values with "describe"');
       return;
     }
     if (obj.type && obj.types) {
@@ -393,7 +393,9 @@ const store = (function() {
         if (!isValidType) {
           stateMatchErrors++;
           console.error(
-            'Invalid type. "' + _.last(cubbieDescription.statePath) + '" must be of type ' + cubbieDescription.type
+            'Invalid type. "state.' +
+            cubbieDescription.statePath.join('.') +
+            '" must be of type ' + cubbieDescription.type
           );
         }
       }
@@ -404,7 +406,9 @@ const store = (function() {
         if (!isValidType) {
           stateMatchErrors++;
           console.error(
-            'Invalid type. "' + _.last(cubbieDescription.statePath) + '" must be of type: ' + cubbieDescription.types.join(' or ')
+            'Invalid type. "state.' +
+            cubbieDescription.statePath.join('.') +
+            '" must be of type: ' + cubbieDescription.types.join(' or ')
           );
         }
       }
@@ -412,7 +416,9 @@ const store = (function() {
       if (cubbieDescription.values) {
         if (!_.includes(cubbieDescription.values, stateVal)) {
           console.error(
-            'Invalid value. "' + _.last(cubbieDescription.statePath) + '" must be: ' + cubbieDescription.values.join(' or ')
+            'Invalid value. "state.' +
+            cubbieDescription.statePath.join('.') +
+            '" must be: ' + cubbieDescription.values.join(' or ')
           );
           stateMatchErrors++;
         }

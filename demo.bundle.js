@@ -60,11 +60,13 @@
 
 	_index2.default.describeState({
 	  people: _index2.default.describe({ types: ['Array', 'Null'] }),
-	  currentPanel: _index2.default.describe({ type: 'String' }),
+	  currentPanel: _index2.default.describe({ type: 'String', values: ['HOME', 'IRON'] }),
 	  animal: {
 	    info: _index2.default.describe({ type: 'Array' })
 	  },
-	  currentPanel: _index2.default.describe({ type: 'String', values: ['HOME', 'IRON'] })
+	  currentPerson: {
+	    name: _index2.default.describe({ values: ['Sam'] })
+	  }
 	});
 
 	_index2.default.initialState = {
@@ -133,6 +135,9 @@
 	        if (_lodash2.default.includes(type, 'Element')) {
 	          if (_lodash2.default.isElement(value)) return true;
 	        }
+	        if (_lodash2.default.includes(type, 'Null')) {
+	          if (_lodash2.default.isNull(value)) return true;
+	        }
 	        if (_lodash2.default.includes(type, 'Number')) {
 	          if (_lodash2.default.isNumber(value)) return true;
 	        }
@@ -148,6 +153,9 @@
 	        if (_lodash2.default.includes(type, 'Symbol')) {
 	          if (_lodash2.default.isSymbol(value)) return true;
 	        }
+	        if (_lodash2.default.includes(type, 'Undefined')) {
+	          if (_lodash2.default.isUndefined(value)) return true;
+	        }
 	        return false;
 	      } else {
 	        if (type === 'Array') {
@@ -158,6 +166,8 @@
 	          if (!_lodash2.default.isDate(value)) return false;
 	        } else if (type === 'Element') {
 	          if (!_lodash2.default.isElement(value)) return false;
+	        } else if (type === 'Null') {
+	          if (!_lodash2.default.isNull(value)) return false;
 	        } else if (type === 'Number') {
 	          if (!_lodash2.default.isNumber(value)) return false;
 	        } else if (type === 'Object') {
@@ -168,6 +178,8 @@
 	          if (!_lodash2.default.isString(value)) return false;
 	        } else if (type === 'Symbol') {
 	          if (!_lodash2.default.isSymbol(value)) return false;
+	        } else if (type === 'Undefined') {
+	          if (!_lodash2.default.isUndefined(value)) return false;
 	        }
 	        return true;
 	      }
@@ -185,8 +197,8 @@
 	    if (!_lodash2.default.isPlainObject(obj)) {
 	      console.error('Must pass object to "describe"');
 	    }
-	    if (!obj.type && !obj.types) {
-	      console.error('Must specify type or types with "describe"');
+	    if (!obj.type && !obj.types && !obj.values) {
+	      console.error('Must specify type, types, or values with "describe"');
 	      return;
 	    }
 	    if (obj.type && obj.types) {
@@ -320,7 +332,7 @@
 	      return currentState();
 	    }
 
-	    if (!doesStateMatchDescriptions(tempState)) {
+	    if (!doesStateMatchStateDescription(tempState)) {
 	      console.warn('Cubbie Warning: State does not match description. Modification aborted.');
 	      return currentState();
 	    }
@@ -356,7 +368,7 @@
 	    }
 
 	    if (describedFields.length) {
-	      if (!doesStateMatchDescriptions(obj)) {
+	      if (!doesStateMatchStateDescription(obj)) {
 	        console.warn('Cubbie Warning: Could not set initialState. State does not match state description.');
 	        return cubbie;
 	      }
@@ -441,7 +453,7 @@
 
 	  /*
 	  */
-	  function doesStateMatchDescriptions(state) {
+	  function doesStateMatchStateDescription(state) {
 	    var stateMatchErrors = 0;
 
 	    _lodash2.default.each(describedFields, function (cubbieDescription) {
@@ -452,7 +464,7 @@
 
 	        if (!isValidType) {
 	          stateMatchErrors++;
-	          console.error('Invalid type. "' + _lodash2.default.last(cubbieDescription.statePath) + '" must be of type ' + cubbieDescription.type);
+	          console.error('Invalid type. "state.' + cubbieDescription.statePath.join('.') + '" must be of type ' + cubbieDescription.type);
 	        }
 	      }
 
@@ -461,13 +473,13 @@
 
 	        if (!isValidType) {
 	          stateMatchErrors++;
-	          console.error('Invalid type. "' + _lodash2.default.last(cubbieDescription.statePath) + '" must be of type: ' + cubbieDescription.types.join(' or '));
+	          console.error('Invalid type. "state.' + cubbieDescription.statePath.join('.') + '" must be of type: ' + cubbieDescription.types.join(' or '));
 	        }
 	      }
 
 	      if (cubbieDescription.values) {
 	        if (!_lodash2.default.includes(cubbieDescription.values, stateVal)) {
-	          console.error('Invalid value. "' + _lodash2.default.last(cubbieDescription.statePath) + '" must be: ' + cubbieDescription.values.join(' or '));
+	          console.error('Invalid value. "state.' + cubbieDescription.statePath.join('.') + '" must be: ' + cubbieDescription.values.join(' or '));
 	          stateMatchErrors++;
 	        }
 	      }

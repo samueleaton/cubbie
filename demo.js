@@ -8,11 +8,13 @@ cubbie.on('STATE_SET', () => {
 
 cubbie.describeState({
   people: cubbie.describe({ types: ['Array', 'Null'] }),
-  currentPanel: cubbie.describe({ type: 'String' }),
+  currentPanel: cubbie.describe({ type: 'String', values: ['HOME', 'IRON'] }),
   animal: {
     info: cubbie.describe({ type: 'Array' })
   },
-  currentPanel: cubbie.describe({ type: 'String', values: ['HOME', 'IRON'] })
+  currentPerson: {
+    name: cubbie.describe({ values: ['Sam'] })
+  }
 });
 
 cubbie.initialState = {
