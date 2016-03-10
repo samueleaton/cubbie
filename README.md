@@ -20,7 +20,7 @@ import store from 'cubbie'; // es2015
 const store = require('cubbie');
 ```
 
-#### Initial State
+### Initial State
 
 Before you can start tracking state, you need to set an initial state:
 
@@ -36,7 +36,7 @@ To get the initial state:
 store.initialState;
 ```
 
-#### Current State
+### Current State
 
 ``` javascript
 store.state;
@@ -44,7 +44,7 @@ store.state;
 
 The you can also access the current state by getting the last element in the array returned from `store.stateHistory`.
 
-#### State History
+### State History
 
 Returns array of all of the states in history since the initial state.
 
@@ -54,7 +54,7 @@ store.stateHistory;
 
 **Note:** Reverting or resetting the state will remove states from the state history. Modifying the state will append a new state to the state history.
 
-#### Modifying State
+### Modifying State
 
 Pass a callback where you modify the state object.
 
@@ -86,13 +86,13 @@ store.stateHistory.length; // then now its 2
 
 `modifyState` will return the new current state.
 
-#### Get Previous State
+### Get Previous State
 
 ``` javascript
 store.previousState;
 ```
 
-#### Resetting State
+### Resetting State
 
 This will reset the state to the initial state.
 
@@ -102,7 +102,7 @@ store.resetState();
 
 `modifyState` triggers the `STATE_RESET` event. See the **Events** section.
 
-#### Reverting State
+### Reverting State
 
 This will revert the state to a previous state.
 
@@ -147,7 +147,7 @@ store.revertState(state => {
 
 `revertState` triggers the `STATE_REVERTED` event. See the **Events** section.
 
-#### Freezing State Structure
+### Freezing State Structure
 
 The `freeze` method will prevent:
 
@@ -200,7 +200,7 @@ store.modifyState(state => {
 ```
 
 
-#### Static State
+### Static State
 
 Internally, static state is a totally separate object from the normal state. It is meant to be set from the beginning of the app and it cannot be changed, unless you totally reset it.
 
@@ -218,7 +218,7 @@ store.staticState = {x: 11, y: 'yee'};
 store.staticState;
 ```
 
-#### Events
+### Events
 
 **Adding Event Listeners**
 
@@ -276,3 +276,62 @@ The only purpose of `probeState()` is to trigger the `STATE_PROBED` event.
 To get an array of all state events, access the `stateEvents` property.
 
 
+### Enforcing Types and/or Values
+
+If you want to enforce types and/or values, you can do so by describing the state. 
+
+There are 2 important methods: `describeState` and `describe`.
+
+Use `describeState` to initialize the state description. Use `describe` to describe a specific field.
+
+Example
+
+``` javascript
+const desc = store.describe;
+
+store.describeState({
+  name: desc({ type: 'String' }),
+  age: desc({ types: ['Number', 'Null'] }),
+  pet: {
+    name: desc({ type: 'String' }),
+    kind: desc({ values: ['cat', 'dog'] })
+  }
+});
+
+store.initialState = {
+  name: 'Sam',
+  age: 25,
+  pet: {
+    name: 'Izzy',
+    kind: 'cat',
+    breed: 'tabby' // not described, so can be ANY value
+  }
+};
+
+store.freeze(); // optional
+
+```
+
+You don't have to define every single piece of the state.
+
+##### About the `describe` Method
+
+**There are three properties for `describe`:**
+- **`type`** - A single string
+- **`types`** - An array of types
+- **`values`** - An array of values
+
+`type` and `types` cannot be used in the same description object.
+
+**The following are valid types to use as a `type` or in `types`:**
+- `'Array'`
+- `'Boolean'`
+- `'Date'`
+- `'Element'`
+- `'Null'`
+- `'Number'`
+- `'Object'`
+- `'RegExp'`
+- `'String'`
+- `'Symbol'`
+- `'Undefined'`

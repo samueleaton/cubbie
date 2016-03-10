@@ -1028,7 +1028,7 @@ body .markdown-body
 const store = require('cubbie');
 </code></pre>
 
-<h4 id="initial-state"><a name="user-content-initial-state" href="#initial-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Initial State</h4>
+<h3 id="initial-state"><a name="user-content-initial-state" href="#initial-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Initial State</h3>
 <p>Before you can start tracking state, you need to set an initial state:</p>
 <pre><code class="javascript">store.initialState = {currentPage: 'home', loggedIn: true, etc: '...'};
 </code></pre>
@@ -1038,18 +1038,18 @@ const store = require('cubbie');
 <pre><code class="javascript">store.initialState;
 </code></pre>
 
-<h4 id="current-state"><a name="user-content-current-state" href="#current-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Current State</h4>
+<h3 id="current-state"><a name="user-content-current-state" href="#current-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Current State</h3>
 <pre><code class="javascript">store.state;
 </code></pre>
 
 <p>The you can also access the current state by getting the last element in the array returned from <code>store.stateHistory</code>.</p>
-<h4 id="state-history"><a name="user-content-state-history" href="#state-history" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>State History</h4>
+<h3 id="state-history"><a name="user-content-state-history" href="#state-history" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>State History</h3>
 <p>Returns array of all of the states in history since the initial state.</p>
 <pre><code class="javascript">store.stateHistory;
 </code></pre>
 
 <p><strong>Note:</strong> Reverting or resetting the state will remove states from the state history. Modifying the state will append a new state to the state history.</p>
-<h4 id="modifying-state"><a name="user-content-modifying-state" href="#modifying-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Modifying State</h4>
+<h3 id="modifying-state"><a name="user-content-modifying-state" href="#modifying-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Modifying State</h3>
 <p>Pass a callback where you modify the state object.</p>
 <pre><code class="javascript">store.modifyState(state =&gt; {
     state.x = y;
@@ -1073,17 +1073,17 @@ store.stateHistory.length; // then now its 2
 
 <p><code>modifyState</code> triggers the <code>STATE_MODIFIED</code> event. See the <strong>Events</strong> section.</p>
 <p><code>modifyState</code> will return the new current state.</p>
-<h4 id="get-previous-state"><a name="user-content-get-previous-state" href="#get-previous-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Get Previous State</h4>
+<h3 id="get-previous-state"><a name="user-content-get-previous-state" href="#get-previous-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Get Previous State</h3>
 <pre><code class="javascript">store.previousState;
 </code></pre>
 
-<h4 id="resetting-state"><a name="user-content-resetting-state" href="#resetting-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Resetting State</h4>
+<h3 id="resetting-state"><a name="user-content-resetting-state" href="#resetting-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Resetting State</h3>
 <p>This will reset the state to the initial state.</p>
 <pre><code class="javascript">store.resetState();
 </code></pre>
 
 <p><code>modifyState</code> triggers the <code>STATE_RESET</code> event. See the <strong>Events</strong> section.</p>
-<h4 id="reverting-state"><a name="user-content-reverting-state" href="#reverting-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Reverting State</h4>
+<h3 id="reverting-state"><a name="user-content-reverting-state" href="#reverting-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Reverting State</h3>
 <p>This will revert the state to a previous state.</p>
 <p><strong>With No Arguments</strong></p>
 <p>If nothing is passed as an argument, then the current state will be reverted to the most recent previous state:  </p>
@@ -1111,7 +1111,7 @@ store.stateHistory.length; // then now its 2
 </code></pre>
 
 <p><code>revertState</code> triggers the <code>STATE_REVERTED</code> event. See the <strong>Events</strong> section.</p>
-<h4 id="freezing-state-structure"><a name="user-content-freezing-state-structure" href="#freezing-state-structure" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Freezing State Structure</h4>
+<h3 id="freezing-state-structure"><a name="user-content-freezing-state-structure" href="#freezing-state-structure" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Freezing State Structure</h3>
 <p>The <code>freeze</code> method will prevent:</p>
 <ul>
 <li>Adding properties to the state</li>
@@ -1158,7 +1158,7 @@ store.modifyState(state =&gt; {
 });
 </code></pre>
 
-<h4 id="static-state"><a name="user-content-static-state" href="#static-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Static State</h4>
+<h3 id="static-state"><a name="user-content-static-state" href="#static-state" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Static State</h3>
 <p>Internally, static state is a totally separate object from the normal state. It is meant to be set from the beginning of the app and it cannot be changed, unless you totally reset it.</p>
 <p>The purpose is to store information that shouldn&rsquo;t need to be changed, such as URLs, file paths, config information, etc. </p>
 <p><strong>Setting Static State</strong></p>
@@ -1169,7 +1169,7 @@ store.modifyState(state =&gt; {
 <pre><code class="javascript">store.staticState;
 </code></pre>
 
-<h4 id="events"><a name="user-content-events" href="#events" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Events</h4>
+<h3 id="events"><a name="user-content-events" href="#events" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Events</h3>
 <p><strong>Adding Event Listeners</strong></p>
 <pre><code class="javascript">store.on('EVENT_NAME', () =&gt; {
     // callback
@@ -1212,4 +1212,53 @@ store.modifyState(state =&gt; {
 <li><code>STATE_PROBED</code> - Triggered on <code>store.probeState();</code></li>
 </ul>
 <p>The only purpose of <code>probeState()</code> is to trigger the <code>STATE_PROBED</code> event.</p>
-<p>To get an array of all state events, access the <code>stateEvents</code> property.</p></article></body></html>
+<p>To get an array of all state events, access the <code>stateEvents</code> property.</p>
+<h3 id="enforcing-types-andor-values"><a name="user-content-enforcing-types-andor-values" href="#enforcing-types-andor-values" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Enforcing Types and/or Values</h3>
+<p>If you want to enforce types and/or values, you can do so by describing the state. </p>
+<p>There are 2 important methods: <code>describeState</code> and <code>describe</code>.</p>
+<p>Use <code>describeState</code> to initialize the state description. Use <code>describe</code> to describe a specific field.</p>
+<p>Example</p>
+<pre><code class="javascript">const desc = store.describe;
+
+store.describeState({
+  name: desc({ type: 'String' }),
+  age: desc({ types: ['Number', 'Null'] }),
+  pet: {
+    name: desc({ type: 'String' }),
+    kind: desc({ values: ['cat', 'dog'] })
+  }
+});
+
+store.initialState = {
+  name: 'Sam',
+  age: 25,
+  pet: {
+    name: 'Izzy',
+    kind: 'cat',
+    breed: 'tabby' // not described, so can be ANY value
+  }
+};
+
+store.freeze(); // optional
+
+</code></pre>
+
+<p>You don&rsquo;t have to define every single piece of the state.</p>
+<h5 id="about-the-describe-method"><a name="user-content-about-the-describe-method" href="#about-the-describe-method" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>About the <code>describe</code> Method</h5>
+<p><strong>There are three properties for <code>describe</code>:</strong><br />
+- <strong><code>type</code></strong> - A single string<br />
+- <strong><code>types</code></strong> - An array of types<br />
+- <strong><code>values</code></strong> - An array of values</p>
+<p><code>type</code> and <code>types</code> cannot be used in the same description object.</p>
+<p><strong>The following are valid types to use as a <code>type</code> or in <code>types</code>:</strong><br />
+- <code>'Array'</code><br />
+- <code>'Boolean'</code><br />
+- <code>'Date'</code><br />
+- <code>'Element'</code><br />
+- <code>'Null'</code><br />
+- <code>'Number'</code><br />
+- <code>'Object'</code><br />
+- <code>'RegExp'</code><br />
+- <code>'String'</code><br />
+- <code>'Symbol'</code><br />
+- <code>'Undefined'</code></p></article></body></html>

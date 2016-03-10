@@ -6,6 +6,15 @@ cubbie.on('STATE_SET', () => {
   console.log('State Set.');
 });
 
+cubbie.describeState({
+  people: cubbie.describe({ types: ['Array', 'Null'] }),
+  currentPanel: cubbie.describe({ type: 'String' }),
+  animal: {
+    info: cubbie.describe({ type: 'Array' })
+  },
+  currentPanel: cubbie.describe({ type: 'String', values: ['HOME', 'IRON'] })
+});
+
 cubbie.initialState = {
   people: [
     {name: "Sam", age: 25},
@@ -13,10 +22,10 @@ cubbie.initialState = {
     {name: "Nick", age: 21}
   ],
   animal: {
-  	info: [null]
+    info: [null]
   },
   currentPerson: {name: "Sam", age: 25},
   currentPanel: 'HOME'
 };
 
-
+cubbie.freeze();

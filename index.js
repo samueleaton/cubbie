@@ -2,42 +2,125 @@
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
-var _lodash = require('lodash.foreach');
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _lodash3 = require('lodash.isArray');
-
-var _lodash4 = _interopRequireDefault(_lodash3);
-
-var _lodash5 = require('lodash.clonedeep');
-
-var _lodash6 = _interopRequireDefault(_lodash5);
-
-var _lodash7 = require('lodash.findlastindex');
-
-var _lodash8 = _interopRequireDefault(_lodash7);
-
-var _lodash9 = require('lodash.difference');
-
-var _lodash10 = _interopRequireDefault(_lodash9);
-
-var _lodash11 = require('lodash.isobjectlike');
-
-var _lodash12 = _interopRequireDefault(_lodash11);
-
-var _lodash13 = require('lodash.keys');
-
-var _lodash14 = _interopRequireDefault(_lodash13);
-
-var _lodash15 = require('lodash.forown');
-
-var _lodash16 = _interopRequireDefault(_lodash15);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var CubbieDescription = function () {
+  _createClass(CubbieDescription, null, [{
+    key: 'doesValueMatchType',
+    value: function doesValueMatchType(value, type) {
+      if (_lodash2.default.isArray(type)) {
+        if (_lodash2.default.includes(type, 'Array')) {
+          if (_lodash2.default.isArray(value)) return true;
+        }
+        if (_lodash2.default.includes(type, 'Boolean')) {
+          if (_lodash2.default.isBoolean(value)) return true;
+        }
+        if (_lodash2.default.includes(type, 'Date')) {
+          if (_lodash2.default.isDate(value)) return true;
+        }
+        if (_lodash2.default.includes(type, 'Element')) {
+          if (_lodash2.default.isElement(value)) return true;
+        }
+        if (_lodash2.default.includes(type, 'Null')) {
+          if (_lodash2.default.isNull(value)) return true;
+        }
+        if (_lodash2.default.includes(type, 'Number')) {
+          if (_lodash2.default.isNumber(value)) return true;
+        }
+        if (_lodash2.default.includes(type, 'Object')) {
+          if (_lodash2.default.isPlainObject(value)) return true;
+        }
+        if (_lodash2.default.includes(type, 'RegExp')) {
+          if (_lodash2.default.isRegExp(value)) return true;
+        }
+        if (_lodash2.default.includes(type, 'String')) {
+          if (_lodash2.default.isString(value)) return true;
+        }
+        if (_lodash2.default.includes(type, 'Symbol')) {
+          if (_lodash2.default.isSymbol(value)) return true;
+        }
+        if (_lodash2.default.includes(type, 'Undefined')) {
+          if (_lodash2.default.isUndefined(value)) return true;
+        }
+        return false;
+      } else {
+        if (type === 'Array') {
+          if (!_lodash2.default.isArray(value)) return false;
+        } else if (type === 'Boolean') {
+          if (!_lodash2.default.isBoolean(value)) return false;
+        } else if (type === 'Date') {
+          if (!_lodash2.default.isDate(value)) return false;
+        } else if (type === 'Element') {
+          if (!_lodash2.default.isElement(value)) return false;
+        } else if (type === 'Null') {
+          if (!_lodash2.default.isNull(value)) return false;
+        } else if (type === 'Number') {
+          if (!_lodash2.default.isNumber(value)) return false;
+        } else if (type === 'Object') {
+          if (!_lodash2.default.isPlainObject(value)) return false;
+        } else if (type === 'RegExp') {
+          if (!_lodash2.default.isRegExp(value)) return false;
+        } else if (type === 'String') {
+          if (!_lodash2.default.isString(value)) return false;
+        } else if (type === 'Symbol') {
+          if (!_lodash2.default.isSymbol(value)) return false;
+        } else if (type === 'Undefined') {
+          if (!_lodash2.default.isUndefined(value)) return false;
+        }
+        return true;
+      }
+    }
+  }, {
+    key: 'isCubbieDescription',
+    value: function isCubbieDescription(obj) {
+      return obj instanceof CubbieDescription || obj.constructor === CubbieDescription;
+    }
+  }]);
+
+  function CubbieDescription(obj) {
+    _classCallCheck(this, CubbieDescription);
+
+    if (!_lodash2.default.isPlainObject(obj)) {
+      console.error('Must pass object to "describe"');
+    }
+    if (!obj.type && !obj.types) {
+      console.error('Must specify type or types with "describe"');
+      return;
+    }
+    if (obj.type && obj.types) {
+      console.error('Cannot specify both "type" and "types" with "describe"');
+      return;
+    }
+    if (obj.type && _lodash2.default.isString(obj.type)) {
+      this.type = obj.type;
+    }
+    if (obj.types && _lodash2.default.isArray(obj.types)) {
+      this.types = obj.types;
+    }
+    if (!_lodash2.default.isUndefined(obj.values)) {
+      if (_lodash2.default.isArray(obj.values)) {
+        if (obj.values.length) this.values = obj.values;else console.error('"values" cannot be an empty array in "describe"');
+      } else console.error('"values" must be an array in "describe"');
+    }
+
+    this.statePath = [];
+  }
+
+  return CubbieDescription;
+}();
 
 /* EVENT EMITTER
 */
+
+
 var event = function () {
   var events = {};
 
@@ -47,10 +130,10 @@ var event = function () {
     return _stateEvents.indexOf(evt) !== -1;
   }
   function on(arg, cb) {
-    var args = (0, _lodash4.default)(arg) ? arg : [arg];
+    var args = _lodash2.default.isArray(arg) ? arg : [arg];
     if (typeof cb !== 'function') return console.error('Cubbie Error: Last param to "on" must be of type "function".');
-    (0, _lodash2.default)(args, function (evt) {
-      if (!(0, _lodash4.default)(events[evt])) events[evt] = [];
+    _lodash2.default.each(args, function (evt) {
+      if (!_lodash2.default.isArray(events[evt])) events[evt] = [];
       events[evt].push(cb);
     });
     return store;
@@ -61,11 +144,11 @@ var event = function () {
     }
 
     if (isStateEvent(evt)) {
-      (0, _lodash2.default)(events[evt], function (cb) {
+      _lodash2.default.each(events[evt], function (cb) {
         return cb.apply(undefined, [store.currentState()].concat(args));
       });
     } else if (!events[evt]) return store;else {
-      (0, _lodash2.default)(events[evt], function (cb) {
+      _lodash2.default.each(events[evt], function (cb) {
         return cb.apply(undefined, args);
       });
       return store;
@@ -87,23 +170,27 @@ var event = function () {
 var store = function () {
   var states = [];
   var staticStateObj = {};
+  var describedFields = [];
   var keyTree = {};
   var frozen = false;
   var initialStateSet = false;
 
-  /**/
+  /*
+  */
   function currentState() {
-    return (0, _lodash6.default)(states[states.length - 1]);
+    return _lodash2.default.cloneDeep(states[states.length - 1]);
   }
 
-  /**/
+  /*
+  */
   function resetState() {
     states.splice(1);
     event.emit('STATE_RESET');
     return cubbie;
   }
 
-  /**/
+  /*
+  */
   function revertState(n) {
     if (typeof n === 'function') return revertStateWhere(n);
 
@@ -114,12 +201,13 @@ var store = function () {
     return true;
   }
 
-  /**/
+  /*
+  */
   function revertStateWhere(cb) {
     var _history = stateHistory();
     var _historyLength = _history.length;
 
-    var index = (0, _lodash8.default)(_history, function (state) {
+    var index = _lodash2.default.findLastIndex(_history, function (state) {
       if (cb(state)) return true;
     });
 
@@ -128,7 +216,8 @@ var store = function () {
     return revertState(_historyLength - (index + 1));
   }
 
-  /**/
+  /*
+  */
   function modifyState(func) {
     var tempState = currentState();
     func(tempState);
@@ -138,76 +227,163 @@ var store = function () {
       return currentState();
     }
 
+    if (!doesStateMatchStateDescription(tempState)) {
+      console.warn('Cubbie Warning: State does not match description. Modification aborted.');
+      return currentState();
+    }
+
     setNewState(tempState);
     event.emit('STATE_MODIFIED');
     return currentState();
   }
 
-  /**/
+  /*
+  */
   function previousState() {
     if (states.length <= 2) return Object.assign({}, states[1]);else return Object.assign({}, states[states.length - 2]);
   }
 
-  /**/
+  /*
+  */
   function getInitialState(obj) {
-    return (0, _lodash6.default)(states[0]);
+    return _lodash2.default.cloneDeep(states[0]);
   }
 
-  /**/
+  /*
+  */
   function setInitialState(obj) {
     if (frozen) {
       console.error('Cubbie Error: Cubbie is frozen, cannot set initialState again.');
       return null;
     }
 
-    if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) !== 'object') {
-      console.error('Cubbie Error: Must assign object to initialState. Instead assigned ' + (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)));
+    if (!_lodash2.default.isPlainObject(obj)) {
+      console.error('Cubbie Error: Must assign plain object to initialState.');
       return null;
     }
 
+    if (describedFields.length) {
+      if (!doesStateMatchStateDescription(obj)) {
+        console.warn('Cubbie Warning: Could not set initialState. State does not match state description.');
+        return cubbie;
+      }
+    }
     states[0] = obj;
     initialStateSet = true;
     event.emit('STATE_SET');
     return cubbie;
   }
 
-  /**/
+  /*
+  */
   function setNewState(obj) {
     states.push(obj);
   }
 
-  /**/
+  /*
+  */
   function stateHistory() {
     return states.map(function (x) {
-      return (0, _lodash6.default)(x);
+      return _lodash2.default.cloneDeep(x);
     });
   }
 
-  /**/
+  /*
+  */
   function setStaticState(obj) {
-    if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) !== 'object') {
-      console.error('Cubbie Error: Must assign object to staticState. Instead assigned ' + (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)));
+    if (!_lodash2.default.isPlainObject(obj)) {
+      console.error('Cubbie Error: Must assign object to staticState.');
       return null;
     }
 
-    (0, _lodash2.default)((0, _lodash16.default)(obj), function (v, k) {
-      staticStateObj[k] = v;
-    });
+    staticStateObj = _lodash2.default.cloneDeep(obj);
+
     return cubbie;
   }
 
-  /**/
+  /*
+  */
   function getStaticState() {
     return Object.assign({}, staticStateObj);
   }
 
-  /**/
+  /*
+  */
   function probe() {
     event.emit('STATE_PROBED');
     return cubbie;
   }
 
-  /**/
+  /*
+  */
+  function describe(obj) {
+    if (!_lodash2.default.isPlainObject(obj)) {
+      console.error('Cubbie Error: Must pass object to describe.');
+      return null;
+    }
+    return new CubbieDescription(obj);
+  }
+
+  /*
+  */
+  function describeState(stateSlice, objPath) {
+    var statePath = _lodash2.default.isArray(objPath) ? objPath : [];
+    _lodash2.default.forOwn(stateSlice, function (v, k) {
+      if (states.length) {
+        if (_lodash2.default.isUndefined(getValueGivenStatePath(currentState(), _lodash2.default.concat(statePath, k)))) return console.warn('Cubbie Error: "' + k + '" is not defined in the currentState');
+      }
+
+      if (CubbieDescription.isCubbieDescription(v)) {
+        v.statePath = _lodash2.default.concat(statePath, k);
+        describedFields.push(v);
+      } else if (_lodash2.default.isPlainObject(v)) describeState(v, _lodash2.default.concat(statePath, k));else console.warn('Cubbie Error: "' + k + '" must be plain object or cubbie.describe() in "describeState"');
+    });
+  }
+
+  /*
+  */
+  function getValueGivenStatePath(obj, objPath) {
+    if (objPath.length) return getValueGivenStatePath(obj[objPath[0]], objPath.slice(1));else return obj;
+  }
+
+  /*
+  */
+  function doesStateMatchStateDescription(state) {
+    var stateMatchErrors = 0;
+
+    _lodash2.default.each(describedFields, function (cubbieDescription) {
+      var stateVal = getValueGivenStatePath(state, cubbieDescription.statePath);
+
+      if (cubbieDescription.type) {
+        var isValidType = CubbieDescription.doesValueMatchType(stateVal, cubbieDescription.type);
+
+        if (!isValidType) {
+          stateMatchErrors++;
+          console.error('Invalid type. "' + _lodash2.default.last(cubbieDescription.statePath) + '" must be of type ' + cubbieDescription.type);
+        }
+      }
+
+      if (cubbieDescription.types) {
+        var isValidType = CubbieDescription.doesValueMatchType(stateVal, cubbieDescription.types);
+
+        if (!isValidType) {
+          stateMatchErrors++;
+          console.error('Invalid type. "' + _lodash2.default.last(cubbieDescription.statePath) + '" must be of type: ' + cubbieDescription.types.join(' or '));
+        }
+      }
+
+      if (cubbieDescription.values) {
+        if (!_lodash2.default.includes(cubbieDescription.values, stateVal)) {
+          console.error('Invalid value. "' + _lodash2.default.last(cubbieDescription.statePath) + '" must be: ' + cubbieDescription.values.join(' or '));
+          stateMatchErrors++;
+        }
+      }
+    });
+    return stateMatchErrors === 0;
+  }
+
+  /*
+  */
   function freeze() {
     if (!initialStateSet) {
       console.error('Cubbie Error: Cannot freeze state before initialState is set.');
@@ -223,10 +399,11 @@ var store = function () {
     return cubbie;
   }
 
-  /**/
+  /*
+  */
   function setKeyTree(tree, state) {
-    (0, _lodash16.default)(state, function (v, k) {
-      if ((0, _lodash12.default)(v)) {
+    _lodash2.default.forOwn(state, function (v, k) {
+      if (_lodash2.default.isObjectLike(v)) {
         tree[k] = {};
         setKeyTree(tree[k], state[k]);
       } else {
@@ -235,14 +412,15 @@ var store = function () {
     });
   }
 
-  /**/
+  /*
+  */
   function wasStateRestructured(tree, state) {
-    if ((0, _lodash4.default)(state)) return false;
+    if (_lodash2.default.isArray(state)) return false;
 
-    var treeKeys = (0, _lodash14.default)(tree);
-    var stateKeys = (0, _lodash14.default)(state);
-    var stateToTreeDifference = (0, _lodash10.default)(stateKeys, treeKeys);
-    var treeToStateDifference = (0, _lodash10.default)(treeKeys, stateKeys);
+    var treeKeys = _lodash2.default.keys(tree);
+    var stateKeys = _lodash2.default.keys(state);
+    var stateToTreeDifference = _lodash2.default.difference(stateKeys, treeKeys);
+    var treeToStateDifference = _lodash2.default.difference(treeKeys, stateKeys);
     var errors = false;
 
     if (stateToTreeDifference.length) {
@@ -251,14 +429,14 @@ var store = function () {
       return errors;
     }
 
-    (0, _lodash16.default)(tree, function (v, k) {
-      if ((0, _lodash12.default)(v) && !(0, _lodash12.default)(state[k])) {
+    _lodash2.default.forOwn(tree, function (v, k) {
+      if (_lodash2.default.isObjectLike(v) && !_lodash2.default.isObjectLike(state[k])) {
         console.warn('Cubbie Warning: Cannot convert frozen array or object to another type.', 'Attempted to convert frozen property "' + k + '" to ' + (!state[k] ? state[k] : _typeof(state[k])));
         console.warn();
         errors = true;
         return;
       }
-      if ((0, _lodash12.default)(v)) {
+      if (_lodash2.default.isObjectLike(v)) {
         if (wasStateRestructured(tree[k], state[k])) {
           errors = true;
         }
@@ -276,6 +454,8 @@ var store = function () {
   }
 
   return {
+    describeState: describeState,
+    describe: describe,
     currentState: currentState,
     previousState: previousState,
     resetState: resetState,
@@ -294,6 +474,8 @@ var store = function () {
 /* CUBBIE
 */
 var cubbie = {
+  describeState: store.describeState,
+  describe: store.describe,
   resetState: store.resetState,
   revertState: store.revertState,
   modifyState: store.modifyState,
