@@ -32,13 +32,6 @@
     "webpack": "^1.12.14"
   },
   "dependencies": {
-    "lodash.clonedeep": "^4.3.0",
-    "lodash.difference": "^4.1.1",
-    "lodash.findlastindex": "^4.2.0",
-    "lodash.foreach": "^4.1.0",
-    "lodash.forown": "^4.0.1",
-    "lodash.isarray": "^4.0.0",
-    "lodash.isobjectlike": "^4.0.0",
-    "lodash.keys": "^4.0.5"
+    "lodash": "^4.6.1"
   }
 }
