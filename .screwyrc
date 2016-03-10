@@ -1,0 +1,7 @@
+{
+	"exclude": ["screwy"],
+	"primary": ["transpile", "bundle"],
+	"watch": {
+		"src": "transpile"
+	}
+}
