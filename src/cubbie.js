@@ -393,9 +393,9 @@ const store = (function() {
         if (!isValidType) {
           stateMatchErrors++;
           console.error(
-            'Invalid type. "state.' +
+            'Invalid type. state.' +
             cubbieDescription.statePath.join('.') +
-            '" must be of type ' + cubbieDescription.type
+            ' must be of type ' + cubbieDescription.type
           );
         }
       }
@@ -406,9 +406,9 @@ const store = (function() {
         if (!isValidType) {
           stateMatchErrors++;
           console.error(
-            'Invalid type. "state.' +
+            'Invalid type. state.' +
             cubbieDescription.statePath.join('.') +
-            '" must be of type: ' + cubbieDescription.types.join(' or ')
+            ' must be of type: ' + cubbieDescription.types.join(' or ')
           );
         }
       }
@@ -416,9 +416,9 @@ const store = (function() {
       if (cubbieDescription.values) {
         if (!_.includes(cubbieDescription.values, stateVal)) {
           console.error(
-            'Invalid value. "state.' +
+            'Invalid value "' + stateVal + '". state.' +
             cubbieDescription.statePath.join('.') +
-            '" must be: ' + cubbieDescription.values.join(' or ')
+            ' must be: ' + cubbieDescription.values.join(' or ')
           );
           stateMatchErrors++;
         }
