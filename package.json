@@ -4,7 +4,7 @@
   "description": "Simple state storage",
   "main": "index.js",
   "scripts": {
-    "transpile": "babel src/cubbie.js > index.js",
+    "transpile": "babel src -d .",
     "bundle": "webpack",
     "test": "babel test.js > test.transpiled.js",
     "screwy": "screwy"
