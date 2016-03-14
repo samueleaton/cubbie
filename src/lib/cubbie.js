@@ -164,7 +164,7 @@ function describeState(stateSlice, objPath) {
   const statePath = _.isArray(objPath) ? objPath : [] ;
   _.forOwn(stateSlice, (v, k) => {
     if (states.length) {
-      if (_.isUndefined(getValueGivenStatePath(currentState(), _.concat(statePath, k))))
+      if (_.isUndefined(_.get(currentState(), _.concat(statePath, k))))
         return console.warn('Cubbie Error: "' + k + '" is not defined in the currentState');
     }
 
@@ -181,20 +181,11 @@ function describeState(stateSlice, objPath) {
 
 /*
 */
-function getValueGivenStatePath(obj, objPath) {
-  if (objPath.length)
-    return getValueGivenStatePath(obj[objPath[0]], objPath.slice(1));
-  else
-    return obj;
-}
-
-/*
-*/
 function doesStateMatchStateDescription(state) {
   let stateMatchErrors = 0;
 
   _.each(describedFields, cubbieDescription => {
-    const stateVal = getValueGivenStatePath(state, cubbieDescription.statePath);
+    const stateVal = _.get(state, cubbieDescription.statePath);
 
     if (cubbieDescription.type) {
       let isValidType = CubbieDescription.doesValueMatchType(stateVal, cubbieDescription.type);
