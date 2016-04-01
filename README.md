@@ -263,6 +263,8 @@ store.on(store.stateEvents, () => {
 })
 ```
 
+NOTE: You can also use `once` method to only run the handler one time.
+
 **Emitting Events**
 
 ``` javascript
