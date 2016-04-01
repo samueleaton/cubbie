@@ -38,28 +38,30 @@ function once(arg, cb) {
   _.each(args, evt => {
     if (!_.isArray(events[evt]))
       events[evt] = [];
+    
+    const callback = (...args) => {
+      cb(...args);
+      const index = events[evt].indexOf(callback);
+      events[evt][index] = null;
+    };
 
-    events[evt].push((() => {
-      let called = false;
-      const callback = (...args) => {
-        if (called) return;
-        called = true;
-        return cb(...args);
-      }
-      return (..args) => done(...args);
-    })());
+    events[evt].push(callback);
   });
 }
 
 function emit(evt, ...args) {
   if (!events[evt])
     return;
-  else
-    _.each(events[evt], cb => cb(...args));
+  else {
+    _.each(events[evt], cb => {
+      if (cb) return cb(...args)
+    });
+  }
 }
 
 const eventEmitter = {
   on,
+  once,
   emit,
   stateEvents: () => stateEvents.map(x => x)
 };

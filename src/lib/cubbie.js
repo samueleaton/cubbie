@@ -353,6 +353,10 @@ const cubbie = {
     eventEmitter.on(...args);
     return this;
   },
+  once(...args) {
+    eventEmitter.once(...args);
+    return this;
+  },
   emit(...args) {
     eventEmitter.emit(...args);
     return this;

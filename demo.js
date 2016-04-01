@@ -31,13 +31,19 @@ cubbie.initialState = {
 };
 
 cubbie.on('HELLO', (name, age) => {
-  console.log('hello ' + name + '. You are ' + age);
+  console.log('1: hello ' + name + '. You are ' + age);
 });
 cubbie.on('HELLO', (name, age) => {
-  console.log('hello ' + name + '. You are ' + age);
+  console.log('2: hello ' + name + '. You are ' + age);
 });
 cubbie.once('HELLO', (name, age) => {
-  console.log('HELLO ' + name + '!!! YOU ARE ' + age + '!!!');
+  console.log('3: HELLO ' + name + '!!! YOU ARE ' + age + '!!!');
+});
+cubbie.once('HELLO', (name, age) => {
+  console.log('4: HELLO ' + name + '!!! YOU ARE ' + age + '!!!');
+});
+cubbie.on('HELLO', (name, age) => {
+  console.log('5: hello ' + name + '. You are ' + age);
 });
 
 cubbie.freeze();

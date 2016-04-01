@@ -78,6 +78,22 @@
 	  currentPanel: 'HOME'
 	};
 
+	_index2.default.on('HELLO', function (name, age) {
+	  console.log('1: hello ' + name + '. You are ' + age);
+	});
+	_index2.default.on('HELLO', function (name, age) {
+	  console.log('2: hello ' + name + '. You are ' + age);
+	});
+	_index2.default.once('HELLO', function (name, age) {
+	  console.log('3: HELLO ' + name + '!!! YOU ARE ' + age + '!!!');
+	});
+	_index2.default.once('HELLO', function (name, age) {
+	  console.log('4: HELLO ' + name + '!!! YOU ARE ' + age + '!!!');
+	});
+	_index2.default.on('HELLO', function (name, age) {
+	  console.log('5: hello ' + name + '. You are ' + age);
+	});
+
 	_index2.default.freeze();
 
 /***/ },
@@ -314,9 +330,9 @@
 	    }
 
 	    if (cubbieDescription.types) {
-	      var _isValidType = _CubbieDescription2.default.doesValueMatchType(stateVal, cubbieDescription.types);
+	      var isValidType = _CubbieDescription2.default.doesValueMatchType(stateVal, cubbieDescription.types);
 
-	      if (!_isValidType) {
+	      if (!isValidType) {
 	        stateMatchErrors++;
 	        console.error('Invalid type. state.' + cubbieDescription.statePath.join('.') + ' must be of type: ' + cubbieDescription.types.join(' or '));
 	      }
@@ -441,6 +457,10 @@
 	  },
 	  on: function on() {
 	    _eventEmitter2.default.on.apply(_eventEmitter2.default, arguments);
+	    return this;
+	  },
+	  once: function once() {
+	    _eventEmitter2.default.once.apply(_eventEmitter2.default, arguments);
 	    return this;
 	  },
 	  emit: function emit() {
@@ -15732,15 +15752,21 @@
 
 /***/ },
 /* 6 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	/* EVENT EMITTER
-	*/
+
+	var _lodash = __webpack_require__(3);
+
+	var _lodash2 = _interopRequireDefault(_lodash);
+
+	function _interopRequireDefault(obj) {
+	  return obj && obj.__esModule ? obj : { default: obj };
+	}
 
 	var events = {
 	  'STATE_SET': [],
@@ -15748,20 +15774,37 @@
 	  'STATE_REVERTED': [],
 	  'STATE_MODIFIED': [],
 	  'STATE_PROBED': []
-	};
+	}; /* EVENT EMITTER
+	   */
 
 	var _stateEvents = ['STATE_SET', 'STATE_RESET', 'STATE_REVERTED', 'STATE_MODIFIED', 'STATE_PROBED'];
 
-	_.each(_stateEvents, function (evt) {
+	_lodash2.default.each(_stateEvents, function (evt) {
 	  events[evt] = [];
 	});
 
 	function on(arg, cb) {
-	  var args = _.isArray(arg) ? arg : [arg];
+	  var args = _lodash2.default.isArray(arg) ? arg : [arg];
 	  if (typeof cb !== 'function') return console.error('Cubbie Error: Last param to "on" must be of type "function".');
-	  _.each(args, function (evt) {
-	    if (!_.isArray(events[evt])) events[evt] = [];
+	  _lodash2.default.each(args, function (evt) {
+	    if (!_lodash2.default.isArray(events[evt])) events[evt] = [];
 	    events[evt].push(cb);
+	  });
+	}
+
+	function once(arg, cb) {
+	  var args = _lodash2.default.isArray(arg) ? arg : [arg];
+	  if (typeof cb !== 'function') return console.error('Cubbie Error: Last param to "on" must be of type "function".');
+	  _lodash2.default.each(args, function (evt) {
+	    if (!_lodash2.default.isArray(events[evt])) events[evt] = [];
+
+	    var callback = function callback() {
+	      cb.apply(undefined, arguments);
+	      var index = events[evt].indexOf(callback);
+	      events[evt][index] = null;
+	    };
+
+	    events[evt].push(callback);
 	  });
 	}
 
@@ -15770,13 +15813,16 @@
 	    args[_key - 1] = arguments[_key];
 	  }
 
-	  if (!events[evt]) return;else _.each(events[evt], function (cb) {
-	    return cb.apply(undefined, args);
-	  });
+	  if (!events[evt]) return;else {
+	    _lodash2.default.each(events[evt], function (cb) {
+	      if (cb) return cb.apply(undefined, args);
+	    });
+	  }
 	}
 
 	var eventEmitter = {
 	  on: on,
+	  once: once,
 	  emit: emit,
 	  stateEvents: function stateEvents() {
 	    return _stateEvents.map(function (x) {
