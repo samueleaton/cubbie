@@ -1111,6 +1111,12 @@ store.stateHistory.length; // then now its 2
 </code></pre>
 
 <p><code>revertState</code> triggers the <code>STATE_REVERTED</code> event. See the <strong>Events</strong> section.</p>
+<h3 id="purging-the-state-history"><a name="user-content-purging-the-state-history" href="#purging-the-state-history" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Purging the State History</h3>
+<p>If you want to clear the state history, for example to save memory, you can run this method.</p>
+<p>It will remove all states from the state history except for the initial state and the current state.</p>
+<pre><code class="javascript">store.purgeStateHistory();
+</code></pre>
+
 <h3 id="freezing-state-structure"><a name="user-content-freezing-state-structure" href="#freezing-state-structure" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Freezing State Structure</h3>
 <p>The <code>freeze</code> method will prevent:</p>
 <ul>

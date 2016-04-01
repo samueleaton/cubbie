@@ -125,6 +125,12 @@ function stateHistory() {
 
 /*
 */
+function purgeStateHistory() {
+  states.splice(1, states.length - 2);
+}
+
+/*
+*/
 function setStaticState(obj) {
   if (!_.isPlainObject(obj)) {
     console.error('Cubbie Error: Must assign object to staticState.');
@@ -322,6 +328,10 @@ const cubbie = {
   },
   revertState(...args) {
     return revertState(...args);
+  },
+  purgeStateHistory() {
+    purgeStateHistory();
+    return this;
   },
   modifyState(...args) {
     modifyState(...args);

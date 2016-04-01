@@ -147,6 +147,16 @@ store.revertState(state => {
 
 `revertState` triggers the `STATE_REVERTED` event. See the **Events** section.
 
+### Purging the State History
+
+If you want to clear the state history, for example to save memory, you can run this method.
+
+It will remove all states from the state history except for the initial state and the current state.
+
+``` javascript
+store.purgeStateHistory();
+```
+
 ### Freezing State Structure
 
 The `freeze` method will prevent:

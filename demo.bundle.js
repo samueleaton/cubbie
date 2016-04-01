@@ -241,6 +241,12 @@
 
 	/*
 	*/
+	function _purgeStateHistory() {
+	  states.splice(1, states.length - 2);
+	}
+
+	/*
+	*/
 	function setStaticState(obj) {
 	  if (!_lodash2.default.isPlainObject(obj)) {
 	    console.error('Cubbie Error: Must assign object to staticState.');
@@ -288,12 +294,6 @@
 	      describedFields.push(v);
 	    } else if (_lodash2.default.isPlainObject(v)) _describeState(v, _lodash2.default.concat(statePath, k));else console.warn('Cubbie Error: "' + k + '" must be plain object or cubbie.describe() in "describeState"');
 	  });
-	}
-
-	/*
-	*/
-	function getValueGivenStatePath(obj, objPath) {
-	  if (objPath.length) return getValueGivenStatePath(obj[objPath[0]], objPath.slice(1));else return obj;
 	}
 
 	/*
@@ -418,6 +418,10 @@
 	  },
 	  revertState: function revertState() {
 	    return _revertState.apply(undefined, arguments);
+	  },
+	  purgeStateHistory: function purgeStateHistory() {
+	    _purgeStateHistory();
+	    return this;
 	  },
 	  modifyState: function modifyState() {
 	    _modifyState.apply(undefined, arguments);
