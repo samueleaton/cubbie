@@ -42,7 +42,7 @@ function once(arg, cb) {
     const callback = (...args) => {
       cb(...args);
       const index = events[evt].indexOf(callback);
-      events[evt][index] = null;
+      events[evt][index] = null; // after running, make callback null
     };
 
     events[evt].push(callback);
