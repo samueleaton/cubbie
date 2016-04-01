@@ -1,5 +1,6 @@
 /* EVENT EMITTER
 */
+import _ from 'lodash';
 
 const events = {
   'STATE_SET': [],
@@ -27,6 +28,26 @@ function on(arg, cb) {
     if (!_.isArray(events[evt]))
       events[evt] = [];
     events[evt].push(cb);
+  });
+}
+
+function once(arg, cb) {
+  const args = _.isArray(arg) ? arg : [ arg ] ;
+  if (typeof cb !== 'function')
+    return console.error('Cubbie Error: Last param to "on" must be of type "function".');
+  _.each(args, evt => {
+    if (!_.isArray(events[evt]))
+      events[evt] = [];
+
+    events[evt].push((() => {
+      let called = false;
+      const callback = (...args) => {
+        if (called) return;
+        called = true;
+        return cb(...args);
+      }
+      return (..args) => done(...args);
+    })());
   });
 }
 

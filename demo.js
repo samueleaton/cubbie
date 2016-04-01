@@ -30,4 +30,14 @@ cubbie.initialState = {
   currentPanel: 'HOME'
 };
 
+cubbie.on('HELLO', (name, age) => {
+  console.log('hello ' + name + '. You are ' + age);
+});
+cubbie.on('HELLO', (name, age) => {
+  console.log('hello ' + name + '. You are ' + age);
+});
+cubbie.once('HELLO', (name, age) => {
+  console.log('HELLO ' + name + '!!! YOU ARE ' + age + '!!!');
+});
+
 cubbie.freeze();
