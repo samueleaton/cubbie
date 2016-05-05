@@ -224,7 +224,12 @@ function doesStateMatchStateDescription(state) {
         console.error(
           'Invalid value "' + stateVal + '". state.' +
           cubbieDescription.statePath.join('.') +
-          ' must be: ' + cubbieDescription.values.join(' or ')
+          ' must be: ' + cubbieDescription.values.map(desc => {
+            if (desc === null) return 'null';
+            else if (desc === undefined) return 'undefined';
+            else if (typeof desc === 'string') return `"${desc}"`;
+            else return desc;
+          }).join(' or ')
         );
         stateMatchErrors++;
       }

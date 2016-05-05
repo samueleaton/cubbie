@@ -330,9 +330,9 @@
 	    }
 
 	    if (cubbieDescription.types) {
-	      var isValidType = _CubbieDescription2.default.doesValueMatchType(stateVal, cubbieDescription.types);
+	      var _isValidType = _CubbieDescription2.default.doesValueMatchType(stateVal, cubbieDescription.types);
 
-	      if (!isValidType) {
+	      if (!_isValidType) {
 	        stateMatchErrors++;
 	        console.error('Invalid type. state.' + cubbieDescription.statePath.join('.') + ' must be of type: ' + cubbieDescription.types.join(' or '));
 	      }
@@ -340,7 +340,9 @@
 
 	    if (cubbieDescription.values) {
 	      if (!_lodash2.default.includes(cubbieDescription.values, stateVal)) {
-	        console.error('Invalid value "' + stateVal + '". state.' + cubbieDescription.statePath.join('.') + ' must be: ' + cubbieDescription.values.join(' or '));
+	        console.error('Invalid value "' + stateVal + '". state.' + cubbieDescription.statePath.join('.') + ' must be: ' + cubbieDescription.values.map(function (desc) {
+	          if (desc === null) return 'null';else if (desc === undefined) return 'undefined';else if (typeof desc === 'string') return '"' + desc + '"';else return desc;
+	        }).join(' or '));
 	        stateMatchErrors++;
 	      }
 	    }
@@ -15801,7 +15803,7 @@
 	    var callback = function callback() {
 	      cb.apply(undefined, arguments);
 	      var index = events[evt].indexOf(callback);
-	      events[evt][index] = null;
+	      events[evt][index] = null; // after running, make callback null
 	    };
 
 	    events[evt].push(callback);
