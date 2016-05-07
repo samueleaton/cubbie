@@ -47,6 +47,10 @@ export default class CubbieDescription {
         if (_.isUndefined(value))
           return true;
       }
+      if (_.includes(type, 'Function')) {
+        if (_.isFunction(value))
+          return true;
+      }
       return false;
     }
     else {
@@ -92,6 +96,10 @@ export default class CubbieDescription {
       }
       else if (type === 'Undefined') {
         if (!_.isUndefined(value))
+          return false;
+      }
+      else if (type === 'Function') {
+        if (!_.isFunction(value))
           return false;
       }
       return true;

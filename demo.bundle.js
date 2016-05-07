@@ -15683,6 +15683,9 @@
 	        if (_lodash2.default.includes(type, 'Undefined')) {
 	          if (_lodash2.default.isUndefined(value)) return true;
 	        }
+	        if (_lodash2.default.includes(type, 'Function')) {
+	          if (_lodash2.default.isFunction(value)) return true;
+	        }
 	        return false;
 	      } else {
 	        if (type === 'Array') {
@@ -15707,6 +15710,8 @@
 	          if (!_lodash2.default.isSymbol(value)) return false;
 	        } else if (type === 'Undefined') {
 	          if (!_lodash2.default.isUndefined(value)) return false;
+	        } else if (type === 'Function') {
+	          if (!_lodash2.default.isFunction(value)) return false;
 	        }
 	        return true;
 	      }
