@@ -325,7 +325,7 @@
 
 	      if (!isValidType) {
 	        stateMatchErrors++;
-	        console.error('Invalid type. state.' + cubbieDescription.statePath.join('.') + ' must be of type ' + cubbieDescription.type);
+	        console.error('Invalid type. Set state.' + cubbieDescription.statePath.join('.') + ' = ' + stateVal + ' (' + _CubbieDescription2.default.getType(stateVal) + '). Must be of type ' + cubbieDescription.type);
 	      }
 	    }
 
@@ -334,7 +334,7 @@
 
 	      if (!_isValidType) {
 	        stateMatchErrors++;
-	        console.error('Invalid type. state.' + cubbieDescription.statePath.join('.') + ' must be of type: ' + cubbieDescription.types.join(' or '));
+	        console.error('Invalid type. Set state.' + cubbieDescription.statePath.join('.') + ' = ' + stateVal + ' (' + _CubbieDescription2.default.getType(stateVal) + '). Must be of type ' + cubbieDescription.types.join(' or '));
 	      }
 	    }
 
@@ -15720,6 +15720,11 @@
 	    key: 'isCubbieDescription',
 	    value: function isCubbieDescription(obj) {
 	      return obj instanceof CubbieDescription || obj.constructor === CubbieDescription;
+	    }
+	  }, {
+	    key: 'getType',
+	    value: function getType(value) {
+	      if (_lodash2.default.isArray(value)) return 'Array';else if (_lodash2.default.isBoolean(value)) return 'Boolean';else if (_lodash2.default.isDate(value)) return 'Date';else if (_lodash2.default.isElement(value)) return 'Element';else if (_lodash2.default.isNull(value)) return 'Null';else if (_lodash2.default.isNumber(value)) return 'Number';else if (_lodash2.default.isPlainObject(value)) return 'Object';else if (_lodash2.default.isRegExp(value)) return 'RegExp';else if (_lodash2.default.isString(value)) return 'String';else if (_lodash2.default.isSymbol(value)) return 'Symbol';else if (_lodash2.default.isUndefined(value)) return 'Undefined';else if (_lodash2.default.isFunction(value)) return 'Function';else return value.contructor.prototype;
 	    }
 	  }]);
 

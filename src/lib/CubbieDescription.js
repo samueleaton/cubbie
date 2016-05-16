@@ -110,6 +110,34 @@ export default class CubbieDescription {
       obj instanceof CubbieDescription || obj.constructor === CubbieDescription
     );
   }
+  static getType(value) {
+    if (_.isArray(value))
+      return 'Array';
+    else if (_.isBoolean(value))
+      return 'Boolean';
+    else if (_.isDate(value))
+      return 'Date';
+    else if (_.isElement(value))
+      return 'Element';
+    else if (_.isNull(value))
+      return 'Null';
+    else if (_.isNumber(value))
+      return 'Number';
+    else if (_.isPlainObject(value))
+      return 'Object';
+    else if (_.isRegExp(value))
+      return 'RegExp';
+    else if (_.isString(value))
+      return 'String';
+    else if (_.isSymbol(value))
+      return 'Symbol';
+    else if (_.isUndefined(value))
+      return 'Undefined';
+    else if (_.isFunction(value))
+      return 'Function';
+    else
+      return value.contructor.prototype;
+  }
   constructor(obj) {
     if (!_.isPlainObject(obj)) {
       console.error('Must pass object to "describe"');

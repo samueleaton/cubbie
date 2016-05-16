@@ -199,9 +199,10 @@ function doesStateMatchStateDescription(state) {
       if (!isValidType) {
         stateMatchErrors++;
         console.error(
-          'Invalid type. state.' +
+          'Invalid type. Set state.' +
           cubbieDescription.statePath.join('.') +
-          ' must be of type ' + cubbieDescription.type
+          ' = ' + stateVal + ' (' + CubbieDescription.getType(stateVal) +
+          '). Must be of type ' + cubbieDescription.type
         );
       }
     }
@@ -212,9 +213,10 @@ function doesStateMatchStateDescription(state) {
       if (!isValidType) {
         stateMatchErrors++;
         console.error(
-          'Invalid type. state.' +
+          'Invalid type. Set state.' +
           cubbieDescription.statePath.join('.') +
-          ' must be of type: ' + cubbieDescription.types.join(' or ')
+          ' = ' + stateVal + ' (' + CubbieDescription.getType(stateVal) +
+          '). Must be of type ' + cubbieDescription.types.join(' or ')
         );
       }
     }
