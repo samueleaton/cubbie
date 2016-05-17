@@ -5,6 +5,7 @@ import eventEmitter from './eventEmitter';
 const states = [];
 let staticStateObj = {};
 const describedFields = [];
+const stateConstraints = [];
 const keyTree = {};
 let frozen = false;
 let initialStateSet = false;
@@ -68,8 +69,13 @@ function modifyState(func) {
     return currentState();
   }
 
-  if (!doesStateMatchStateDescription(tempState)) {
+  if (describedFields.length && !doesStateMatchStateDescription(tempState)) {
     console.warn('Cubbie Warning: State does not match description. Modification aborted.');
+    return currentState();
+  }
+
+  if (stateConstraints.length && !doesStatePassStateConstraints(tempState)) {
+    console.warn('Cubbie Warning: State does not pass constraint. Modification aborted.');
     return currentState();
   }
 
@@ -243,6 +249,33 @@ function doesStateMatchStateDescription(state) {
 
 /*
 */
+function addStateConstraint(constraintName, stateConstraintCb) {
+  stateConstraints.push({ name: constraintName, fn: stateConstraintCb });
+}
+
+/*
+*/
+function doesStatePassStateConstraints(state) {
+  let constraintErrors = [];
+  _.each(stateConstraints, stateConstraintObj => {
+    // console.log('stateConstraintObj: ', stateConstraintObj);
+    // console.log('fn result: ');
+    if (!stateConstraintObj.fn(_.cloneDeep(state))) 
+      constraintErrors.push(stateConstraintObj.name);
+  });
+
+  if (constraintErrors.length) {
+    _.each(constraintErrors, constraintName => {
+      console.error('Failed constraint: ', constraintName);
+    });
+    return false;
+  }
+  else
+    return true;
+}
+
+/*
+*/
 function freeze() {
   if (!initialStateSet) {
     console.error('Cubbie Error: Cannot freeze state before initialState is set.');
@@ -328,6 +361,10 @@ const cubbie = {
   },
   describe(...args) {
     return describe(...args);
+  },
+  addStateConstraint(...args) {
+    addStateConstraint(...args);
+    return this;
   },
   resetState(...args) {
     resetState(...args);

@@ -149,6 +149,7 @@
 	var states = [];
 	var staticStateObj = {};
 	var describedFields = [];
+	var stateConstraints = [];
 	var keyTree = {};
 	var frozen = false;
 	var initialStateSet = false;
@@ -204,8 +205,13 @@
 	    return currentState();
 	  }
 
-	  if (!doesStateMatchStateDescription(tempState)) {
+	  if (describedFields.length && !doesStateMatchStateDescription(tempState)) {
 	    console.warn('Cubbie Warning: State does not match description. Modification aborted.');
+	    return currentState();
+	  }
+
+	  if (stateConstraints.length && !doesStatePassStateConstraints(tempState)) {
+	    console.warn('Cubbie Warning: State does not pass constraint. Modification aborted.');
 	    return currentState();
 	  }
 
@@ -352,6 +358,30 @@
 
 	/*
 	*/
+	function _addStateConstraint(constraintName, stateConstraintCb) {
+	  stateConstraints.push({ name: constraintName, fn: stateConstraintCb });
+	}
+
+	/*
+	*/
+	function doesStatePassStateConstraints(state) {
+	  var constraintErrors = [];
+	  _lodash2.default.each(stateConstraints, function (stateConstraintObj) {
+	    // console.log('stateConstraintObj: ', stateConstraintObj);
+	    // console.log('fn result: ');
+	    if (!stateConstraintObj.fn(_lodash2.default.cloneDeep(state))) constraintErrors.push(stateConstraintObj.name);
+	  });
+
+	  if (constraintErrors.length) {
+	    _lodash2.default.each(constraintErrors, function (constraintName) {
+	      console.error('Failed constraint: ', constraintName);
+	    });
+	    return false;
+	  } else return true;
+	}
+
+	/*
+	*/
 	function _freeze() {
 	  if (!initialStateSet) {
 	    console.error('Cubbie Error: Cannot freeze state before initialState is set.');
@@ -429,6 +459,10 @@
 	  },
 	  describe: function describe() {
 	    return _describe.apply(undefined, arguments);
+	  },
+	  addStateConstraint: function addStateConstraint() {
+	    _addStateConstraint.apply(undefined, arguments);
+	    return this;
 	  },
 	  resetState: function resetState() {
 	    _resetState.apply(undefined, arguments);
