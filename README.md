@@ -340,6 +340,7 @@ You don't have to define every single piece of the state.
 - `'Boolean'`
 - `'Date'`
 - `'Element'`
+- `'Function'`
 - `'Null'`
 - `'Number'`
 - `'Object'`
