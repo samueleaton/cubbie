@@ -1,104 +1,110 @@
 import _ from 'lodash';
 
 export default class CubbieDescription {
-  static doesValueMatchType(value, type) {
-    if (_.isArray(type)) {
-      if (_.includes(type, 'Array')) {
+  static doesValueMatchType(value, _typeObj) {
+    const typeObj = _.isObjectLike(_typeObj) ? _typeObj : { type: _typeObj };
+    if (_.isArray(typeObj.type)) {
+      if (_.includes(typeObj.type, 'ARRAY')) {
         if (_.isArray(value))
           return true;
       }
-      if (_.includes(type, 'Boolean')) {
+      if (_.includes(typeObj.type, 'BOOLEAN')) {
         if (_.isBoolean(value))
           return true;
       }
-      if (_.includes(type, 'Date')) {
+      if (_.includes(typeObj.type, 'DATE')) {
         if (_.isDate(value))
           return true;
       }
-      if (_.includes(type, 'Element')) {
+      if (_.includes(typeObj.type, 'ELEMENT')) {
         if (_.isElement(value))
           return true;
       }
-      if (_.includes(type, 'Null')) {
+      if (_.includes(typeObj.type, 'NULL')) {
         if (_.isNull(value))
           return true;
       }
-      if (_.includes(type, 'Number')) {
+      if (_.includes(typeObj.type, 'NUMBER')) {
         if (_.isNumber(value))
           return true;
       }
-      if (_.includes(type, 'Object')) {
+      if (_.includes(typeObj.type, 'OBJECT')) {
         if (_.isPlainObject(value))
           return true;
       }
-      if (_.includes(type, 'RegExp')) {
+      if (_.includes(typeObj.type, 'REGEXP')) {
         if (_.isRegExp(value))
           return true;
       }
-      if (_.includes(type, 'String')) {
+      if (_.includes(typeObj.type, 'STRING')) {
         if (_.isString(value))
           return true;
       }
-      if (_.includes(type, 'Symbol')) {
+      if (_.includes(typeObj.type, 'SYMBOL')) {
         if (_.isSymbol(value))
           return true;
       }
-      if (_.includes(type, 'Undefined')) {
+      if (_.includes(typeObj.type, 'UNDEFINED')) {
         if (_.isUndefined(value))
           return true;
       }
-      if (_.includes(type, 'Function')) {
+      if (_.includes(typeObj.type, 'FUNCTION')) {
         if (_.isFunction(value))
           return true;
       }
       return false;
     }
     else {
-      if (type === 'Array') {
+      if (typeObj.type === 'ARRAY') {
         if (!_.isArray(value))
           return false;
+        if (
+          typeObj.of &&
+          _.some(value, v => !CubbieDescription.doesValueMatchType(v, typeObj.of))
+        )
+          return false;
       }
-      else if (type === 'Boolean') {
+      else if (typeObj.type === 'BOOLEAN') {
         if (!_.isBoolean(value))
           return false;
       }
-      else if (type === 'Date') {
+      else if (typeObj.type === 'DATE') {
         if (!_.isDate(value))
           return false;
       }
-      else if (type === 'Element') {
+      else if (typeObj.type === 'ELEMENT') {
         if (!_.isElement(value))
           return false;
       }
-      else if (type === 'Null') {
+      else if (typeObj.type === 'NULL') {
         if (!_.isNull(value))
           return false;
       }
-      else if (type === 'Number') {
+      else if (typeObj.type === 'NUMBER') {
         if (!_.isNumber(value))
           return false;
       }
-      else if (type === 'Object') {
+      else if (typeObj.type === 'OBJECT') {
         if (!_.isPlainObject(value))
           return false;
       }
-      else if (type === 'RegExp') {
+      else if (typeObj.type === 'REGEXP') {
         if (!_.isRegExp(value))
           return false;
       }
-      else if (type === 'String') {
+      else if (typeObj.type === 'STRING') {
         if (!_.isString(value))
           return false;
       }
-      else if (type === 'Symbol') {
+      else if (typeObj.type === 'SYMBOL') {
         if (!_.isSymbol(value))
           return false;
       }
-      else if (type === 'Undefined') {
+      else if (typeObj.type === 'UNDEFINED') {
         if (!_.isUndefined(value))
           return false;
       }
-      else if (type === 'Function') {
+      else if (typeObj.type === 'FUNCTION') {
         if (!_.isFunction(value))
           return false;
       }
@@ -112,48 +118,74 @@ export default class CubbieDescription {
   }
   static getType(value) {
     if (_.isArray(value))
-      return 'Array';
+      return 'ARRAY';
     else if (_.isBoolean(value))
-      return 'Boolean';
+      return 'BOOLEAN';
     else if (_.isDate(value))
-      return 'Date';
+      return 'DATE';
     else if (_.isElement(value))
-      return 'Element';
+      return 'ELEMENT';
     else if (_.isNull(value))
-      return 'Null';
+      return 'NULL';
     else if (_.isNumber(value))
-      return 'Number';
+      return 'NUMBER';
     else if (_.isPlainObject(value))
-      return 'Object';
+      return 'OBJECT';
     else if (_.isRegExp(value))
-      return 'RegExp';
+      return 'REGEXP';
     else if (_.isString(value))
-      return 'String';
+      return 'STRING';
     else if (_.isSymbol(value))
-      return 'Symbol';
+      return 'SYMBOL';
     else if (_.isUndefined(value))
-      return 'Undefined';
+      return 'UNDEFINED';
     else if (_.isFunction(value))
-      return 'Function';
+      return 'FUNCTION';
     else
       return value.contructor.prototype;
   }
+  static isValidType(type) {
+    return _.includes([
+      'ARRAY',
+      'BOOLEAN',
+      'DATE',
+      'ELEMENT',
+      'NULL',
+      'NUMBER',
+      'OBJECT',
+      'REGEXP',
+      'STRING',
+      'SYMBOL',
+      'UNDEFINED',
+      'FUNCTION'
+    ], type.toUpperCase());
+  }
+
   constructor(obj) {
-    if (!_.isPlainObject(obj)) {
-      console.error('Must pass object to "describe"');
-    }
-    if (!obj.type && !obj.types && !obj.values) {
-      console.error('Must specify type, types, or values with "describe"');
-      return;
-    }
-    if (obj.type && obj.types) {
-      console.error('Cannot specify both "type" and "types" with "describe"');
-      return;
-    }
+    if (!_.isPlainObject(obj))
+      return console.error('Must pass object to "describe"');
+    if (!obj.type && !obj.types && !obj.values)
+      return console.error('Must specify type, types, or values with "describe"');
+    if (obj.type && obj.types)
+      return console.error('Cannot specify both "type" and "types" with "describe"');
     if (obj.type && _.isString(obj.type)) {
-      this.type = obj.type;
+      if (!CubbieDescription.isValidType(obj.type))
+        return console.error('Invalid type: ' + obj.type);
+      this.type = obj.type.toUpperCase();
+      if (this.type === 'ARRAY' && _.isString(obj.of)) {
+        if (!CubbieDescription.isValidType(obj.of))
+          return console.error('Invalid type: ' + obj.of);
+        this.of = obj.of.toUpperCase();
+      }
     }
     if (obj.types && _.isArray(obj.types)) {
+      if (!obj.types.length)
+        return console.error('Cannot pass an empty array to "types"');
+      const invalidType = _.find(
+        obj.types, type => !CubbieDescription.isValidType(type)
+      );
+      if (invalidType)
+        return console.error('Invalid type: ' + invalidType);
       this.types = obj.types;
     }
     if (!_.isUndefined(obj.values)) {

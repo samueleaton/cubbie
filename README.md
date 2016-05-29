@@ -26,6 +26,8 @@ Before you can start tracking state, you need to set an initial state:
 
 ``` javascript
 store.initialState = {currentPage: 'home', loggedIn: true, etc: '...'};
+// or 
+store.setInitialState({currentPage: 'home', loggedIn: true, etc: '...'});
 ```
 
 `initialState` triggers the `STATE_SET` event. See the **Events** section.
@@ -42,7 +44,7 @@ store.initialState;
 store.state;
 ```
 
-The you can also access the current state by getting the last element in the array returned from `store.stateHistory`.
+This is the same as getting the last element in the array returned from `store.stateHistory`.
 
 ### State History
 
@@ -255,7 +257,7 @@ store.on(
 )
 ```
 
-But because you can ge an array of all state events using `store.stateEvents` you could shorten the above code to:
+But because you can get an array of all state events using `store.stateEvents` you could shorten the above code to:
 
 ``` javascript
 store.on(store.stateEvents, () => {
@@ -277,7 +279,7 @@ Arguments passed to the emitter will be passed as parameters to the event handle
 
 Custom events can be added and emitted, but there are 5 built-in *State Events*. 
 
-- `STATE_SET` - Triggered on `store.initialState = {};`
+- `STATE_SET` - Triggered on `store.initialState = {};` or `store.setInitialState({})`
 - `STATE_RESET` - Triggered on `store.resetState();`
 - `STATE_MODIFIED` - Triggered on `store.modifiyState(() => {});`
 - `STATE_REVERTED` - Triggered on `store.revertState();`
@@ -290,11 +292,19 @@ To get an array of all state events, access the `stateEvents` property.
 
 ### Enforcing Types and/or Values
 
-If you want to enforce types and/or values, you can do so by describing the state. 
+If you want to enforce types and/or values, you can do so by describing the state.
+
+The state description is made for convenience during development, so any described states will not be enforced or checked if `NODE_ENV=production`.
 
 There are 2 important methods: `describeState` and `describe`.
 
-Use `describeState` to initialize the state description. Use `describe` to describe a specific field.
+Use the `describeState` method (or the `stateDescription` setter) to initialize the state description. Use `describe` to describe a specific field. 
+
+``` javascript
+store.describeState({});
+// or 
+store.stateDescription = {};
+```
 
 Example
 
@@ -310,7 +320,7 @@ store.describeState({
   }
 });
 
-store.initialState = {
+store.setInitialState({
   name: 'Sam',
   age: 25,
   pet: {
@@ -318,7 +328,7 @@ store.initialState = {
     kind: 'cat',
     breed: 'tabby' // not described, so can be ANY value
   }
-};
+});
 
 store.freeze(); // optional
 
@@ -328,12 +338,20 @@ You don't have to define every single piece of the state.
 
 ##### About the `describe` Method
 
-**There are three properties for `describe`:**
+**There are four properties for `describe`:**
 - **`type`** - A single string
 - **`types`** - An array of types
 - **`values`** - An array of values
+- **`of`** - Can specify the types of elements in an array if `type` is `Array`
 
-`type` and `types` cannot be used in the same description object.
+``` javascript
+// describes state as an array of numbers
+store.describeState({
+  myNumbers: desc({ type: 'Array', of: 'Number' })
+});
+```
+
+`type` and `types` cannot be used in the same description object for the same property.
 
 **The following are valid types to use as a `type` or in `types`:**
 - `'Array'`

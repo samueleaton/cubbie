@@ -69,14 +69,16 @@ function modifyState(func) {
     return currentState();
   }
 
-  if (describedFields.length && !doesStateMatchStateDescription(tempState)) {
-    console.warn('Cubbie Warning: State does not match description. Modification aborted.');
-    return currentState();
-  }
+  if (process && process.env && process.env.NODE_ENV !== 'production') {
+    if (describedFields.length && !doesStateMatchStateDescription(tempState)) {
+      console.warn('Cubbie Warning: State does not match description. Modification aborted.');
+      return currentState();
+    }
 
-  if (stateConstraints.length && !doesStatePassStateConstraints(tempState)) {
-    console.warn('Cubbie Warning: State does not pass constraint. Modification aborted.');
-    return currentState();
+    if (stateConstraints.length && !doesStatePassStateConstraints(tempState)) {
+      console.warn('Cubbie Warning: State does not pass constraint. Modification aborted.');
+      return currentState();
+    }
   }
 
   setNewState(tempState);
@@ -200,16 +202,27 @@ function doesStateMatchStateDescription(state) {
     const stateVal = _.get(state, cubbieDescription.statePath);
 
     if (cubbieDescription.type) {
-      let isValidType = CubbieDescription.doesValueMatchType(stateVal, cubbieDescription.type);
+      let isValidType = CubbieDescription.doesValueMatchType(stateVal, cubbieDescription);
 
       if (!isValidType) {
         stateMatchErrors++;
-        console.error(
-          'Invalid type. Set state.' +
-          cubbieDescription.statePath.join('.') +
-          ' = ' + stateVal + ' (' + CubbieDescription.getType(stateVal) +
-          '). Must be of type ' + cubbieDescription.type
-        );
+        if (cubbieDescription.type === 'ARRAY' && _.isArray(stateVal) && cubbieDescription.of) {
+          console.error(
+            'Invalid type in ' + cubbieDescription.type + ' of ' + cubbieDescription.of + '. The value at state.' +
+            cubbieDescription.statePath.join('.') +
+            ' (' + _.find(
+              stateVal, v => !CubbieDescription.doesValueMatchType(v, cubbieDescription.of)) +
+            ') is not of type ' + cubbieDescription.of
+          );
+        }
+        else {
+          console.error(
+            'Invalid type. Set state.' +
+            cubbieDescription.statePath.join('.') +
+            ' = ' + stateVal + ' (' + CubbieDescription.getType(stateVal) +
+            '). Must be of type ' + cubbieDescription.type
+          );
+        }
       }
     }
 
@@ -258,8 +271,6 @@ function addStateConstraint(constraintName, stateConstraintCb) {
 function doesStatePassStateConstraints(state) {
   let constraintErrors = [];
   _.each(stateConstraints, stateConstraintObj => {
-    // console.log('stateConstraintObj: ', stateConstraintObj);
-    // console.log('fn result: ');
     if (!stateConstraintObj.fn(_.cloneDeep(state))) 
       constraintErrors.push(stateConstraintObj.name);
   });
@@ -427,6 +438,11 @@ Object.defineProperty(cubbie, 'previousState', {
 Object.defineProperty(cubbie, 'initialState', {
   get: () => getInitialState(),
   set: (obj) => setInitialState(obj)
+});
+
+Object.defineProperty(cubbie, 'stateDescription', {
+  get: () => _.map(describedFields => describedFields),
+  set: (obj) => describeState(obj)
 });
 
 Object.defineProperty(cubbie, 'stateHistory', {
