@@ -2,8 +2,6 @@
 
 Simple state storage
 
-Cubbie has the same use case as Redux but is made for quicker prototyping or smaller apps. Cubbie has less boilerplate. 
-
 ## Installation
 
 ```
@@ -12,12 +10,12 @@ npm i -S cubbie
 
 ## Usage
 
-Obviously, you need to require the library into your project:
+### Creating a Store
 
 ``` javascript
-import store from 'cubbie'; // es2015
-// or 
-const store = require('cubbie');
+const cubbie = require('cubbie');
+
+const store = cubbie.createStore();
 ```
 
 ### Initial State
@@ -309,7 +307,7 @@ store.stateDescription = {};
 Example
 
 ``` javascript
-const desc = store.describe;
+const desc = require('cubbie').describe;
 
 store.describeState({
   name: desc({ type: 'String' }),
@@ -334,7 +332,7 @@ store.freeze(); // optional
 
 ```
 
-You don't have to define every single piece of the state.
+You don't have to describe every single piece of the state.
 
 ##### About the `describe` Method
 
