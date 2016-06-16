@@ -2,6 +2,8 @@
 
 Simple state storage
 
+> State shouldn't be a chore, keep your state in Cubbie's store
+
 ## Installation
 
 ```
