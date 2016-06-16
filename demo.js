@@ -1,7 +1,9 @@
 import cubbie from './index.js';
 import _ from 'lodash';
 
-const store = cubbie.createStore();
+const store = cubbie.createStore({
+  file: './store.cubbie'
+});
 
 window.store = store;
 

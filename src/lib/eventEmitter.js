@@ -9,14 +9,18 @@ class CubbieEventEmitter {
       'STATE_RESET': [],
       'STATE_REVERTED': [],
       'STATE_MODIFIED': [],
-      'STATE_PROBED': []
+      'STATE_PROBED': [],
+      'STATE_COMMITTED': [],
+      'STATE_RELOADED': []
     };
     this.stateEvents = [
       'STATE_SET',
       'STATE_RESET',
       'STATE_REVERTED',
       'STATE_MODIFIED',
-      'STATE_PROBED'
+      'STATE_PROBED',
+      'STATE_COMMITTED',
+      'STATE_RELOADED'
     ];
     _.each(this.stateEvents, evt => { this.events[evt] = [] });
   }

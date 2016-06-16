@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import CubbieDescription from './CubbieDescription';
 import EventEmitter from './eventEmitter';
+import fileSystem from './fileSystem';
 
 /*
 */
@@ -14,7 +15,7 @@ function describe(obj) {
 
 /*
 */
-const createStore = () => (() => {
+const createStore = (configObj = {}) => (() => {
   const states = [];
   let staticStateObj = {};
   const describedFields = [];
@@ -24,6 +25,12 @@ const createStore = () => (() => {
   let initialStateSet = false;
   const eventEmitter = new EventEmitter();
   const views = {};
+
+  if (configObj.file) {
+    if (!fileSystem.isFsAvailable())
+      return console.error('file system is not available in this environment');
+    fileSystem.initStorage(configObj);
+  }
 
   /*
   */
@@ -384,6 +391,51 @@ const createStore = () => (() => {
     return views[viewName](currentState(), ...args);
   }
 
+  /*
+  */
+  function commitState(format = '') {
+    if (!fileSystem.isFsAvailable())
+      return console.error('file system is not available in this environment');
+    if (typeof configObj.file !== 'string')
+      return console.error('file path has not been set or is invalid');
+    fileSystem.commitState(
+      eventEmitter, states[states.length - 1], configObj, format
+    );
+  }
+
+  /*
+  */
+  function reloadState() {
+    if (!fileSystem.isFsAvailable())
+      return console.error('file system is not available in this environment');
+    if (typeof configObj.file !== 'string')
+      return console.error('file path has not been set or is invalid');
+    fileSystem.reloadState(configObj, state => {
+      if (frozen && wasStateRestructured(keyTree, state)) {
+        console.warn('Cubbie Warning: Reload aborted.');
+        return currentState();
+      }
+
+      if (process && process.env && process.env.NODE_ENV !== 'production') {
+        if (describedFields.length && !doesStateMatchStateDescription(state)) {
+          console.warn('Cubbie Warning: State does not match description. Reload aborted.');
+          return currentState();
+        }
+
+        if (stateConstraints.length && !doesStatePassStateConstraints(state)) {
+          console.warn('Cubbie Warning: State does not pass constraint. Reload aborted.');
+          return currentState();
+        }
+      }
+
+      setNewState(state);
+      eventEmitter.emit('STATE_RELOADED');
+      return currentState();
+    });
+  }
+
+
+
 
   /* CUBBIE
   */
@@ -441,7 +493,15 @@ const createStore = () => (() => {
     },
     view(...args) {
       return view(...args);
-    }
+    },
+    commitState(...args) {
+      commitState(...args);
+      return this;
+    },
+    reloadState(...args) {
+      reloadState(...args);
+      return this;
+    },
   };
 
   Object.defineProperty(cubbieMethods, 'state', {
