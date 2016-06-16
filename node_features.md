@@ -6,7 +6,7 @@ To be able to sync the state to disk, define a `file` path when creating a store
 
 Example
 
-```
+``` javascript
 const store = cubbie.createStore({ file: 'path/to/file' });
 ```
 
@@ -18,7 +18,7 @@ To write the contents of the file, run the `commitState` method.
 
 Example
 
-```
+``` javascript
 const store = cubbie.createStore({ file: 'path/to/file' });
 store.setInitialState({/*...*/});
 store.commitState();
@@ -32,7 +32,7 @@ To read in the contents of the file, run the `reloadState` method.
 
 Example
 
-```
+``` javascript
 const store = cubbie.createStore({ file: 'path/to/file' });
 store.setInitialState({/*...*/});
 store.commitState();
@@ -44,11 +44,11 @@ This will trigger the `STATE_RELOADED` event.
 
 ### Encryption
 
-To enable encryption pass an `encryption` object to the `createStore` method along with a `secret` and `algorithm` (optional, default algorithm is `aes-256-ctr`).
+To enable encryption pass an `encryption` object to the `createStore` method with the properties`secret` and `algorithm` (optional / default algorithm is `aes-256-ctr`).
 
 Example
 
-```
+``` javascript
 const store = cubbie.createStore({
     file: 'path/to/file',
     encryption: {

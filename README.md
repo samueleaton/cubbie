@@ -385,3 +385,7 @@ store.describeState({
 - `'String'`
 - `'Symbol'`
 - `'Undefined'`
+
+### Saving State to Disk
+
+See [Node Features](node_features.md)
