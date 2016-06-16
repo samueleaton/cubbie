@@ -38,6 +38,7 @@ store.initialState;
 
 ### Current State
 
+
 ``` javascript
 store.state;
 ```
@@ -88,6 +89,8 @@ store.stateHistory.length; // then now its 2
 
 ### Get Previous State
 
+This returns the state immediately before the current state.
+
 ``` javascript
 store.previousState;
 ```
@@ -106,11 +109,31 @@ store.resetState();
 
 See [Reverting the State](docs/REVERTING_STATE.md)
 
+### Views
+
+Similar in purpose to SQL views, views allow you to store a function that you can call on at any moment.
+
+Example (using lodash's `maxBy`)
+
+``` javascript
+console.log(store.state); /* { people: [
+  {name: 'cat', age: 13}, {name: 'sam', age: 25}, {name: 'jas', age: 20}
+]}
+*/
+
+
+store.createView('oldestPerson', state => {
+  return _.maxBy(state.people, person => person.age);
+});
+
+store.view('oldestPerson'); // {age: 25}
+```
+
 ### Purging the State History
 
 If you want to clear the state history, for example to save memory, you can run this method.
 
-It will remove all states from the state history except for the initial state and the current state.
+It will remove all states from the state history except for the initial state and the current state. The current state will remain intact and no state events will be triggered.
 
 ``` javascript
 store.purgeStateHistory();
@@ -134,23 +157,6 @@ store.staticState = {x: 11, y: 'yee'};
 store.staticState;
 ```
 
-### Views
-
-Similar in purpose to SQL views, views allow you to store a function that you can call on at any moment.
-
-Example (using lodash's `maxBy`)
-
-``` javascript
-console.log(store.state); // { people: [{age: 13}, {age: 25}, {age: 20}] }
-
-
-store.createView('oldestPerson', state => {
-  return _.maxBy(state.people, person => person.age);
-});
-
-store.view('oldestPerson'); // {age: 25}
-```
-
 ### The Event System
 
 See [The Event System](docs/EVENT_SYSTEM.md)
@@ -164,5 +170,7 @@ See [Freezing the State Structure](docs/FREEZE_STATE.md)
 See [State Description: Enforcing Types and/or Values](docs/STATE_DESCRIPTION.md)
 
 ### Saving State to Disk
+
+If, for example, you are building an app in Electron and want to save the state to disk, you totes can.
 
 See [Additional Features for Node](docs/NODE_FEATURES.md)
