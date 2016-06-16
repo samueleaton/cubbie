@@ -24,7 +24,7 @@ Before you can start tracking state, you need to set an initial state:
 
 ``` javascript
 store.initialState = {currentPage: 'home', loggedIn: true, etc: '...'};
-// or 
+// or
 store.setInitialState({currentPage: 'home', loggedIn: true, etc: '...'});
 ```
 
@@ -108,7 +108,7 @@ This will revert the state to a previous state.
 
 **With No Arguments**
 
-If nothing is passed as an argument, then the current state will be reverted to the most recent previous state:  
+If nothing is passed as an argument, then the current state will be reverted to the most recent previous state:
 
 ``` javascript
 store.revertState();
@@ -116,7 +116,7 @@ store.revertState();
 
 A successful revert will return `true`.
 
-You can call `revertState` until you get to the initial state, then it will do nothing and return `false`. 
+You can call `revertState` until you get to the initial state, then it will do nothing and return `false`.
 
 **Reverting *n* Time**
 
@@ -141,7 +141,7 @@ store.revertState(state => {
   return state.page === 'HOME' && state.loggedIn === true;
 });
 
-// Reverts the state to the last time where 
+// Reverts the state to the last time where
 // page was 'HOME' and where loggedIn was true
 ```
 
@@ -188,7 +188,7 @@ store.modifyState(state => {
 }); // aborts, cannot add property to frozen state
 ```
 
-Example 
+Example
 
 ```
 store.setInitialState({
@@ -214,7 +214,7 @@ store.modifyState(state => {
 
 Internally, static state is a totally separate object from the normal state. It is meant to be set from the beginning of the app and it cannot be changed, unless you totally reset it.
 
-The purpose is to store information that shouldn't need to be changed, such as URLs, file paths, config information, etc. 
+The purpose is to store information that shouldn't need to be changed, such as URLs, file paths, config information, etc.
 
 **Setting Static State**
 
@@ -271,11 +271,11 @@ NOTE: You can also use `once` method to only run the handler one time.
 store.emit('EVENT_NAME' [, optional_args]);
 ```
 
-Arguments passed to the emitter will be passed as parameters to the event handler. 
+Arguments passed to the emitter will be passed as parameters to the event handler.
 
 **Built-in Events**
 
-Custom events can be added and emitted, but there are 5 built-in *State Events*. 
+Custom events can be added and emitted, but there are 5 built-in *State Events*.
 
 - `STATE_SET` - Triggered on `store.initialState = {};` or `store.setInitialState({})`
 - `STATE_RESET` - Triggered on `store.resetState();`
@@ -288,6 +288,23 @@ The only purpose of `probeState()` is to trigger the `STATE_PROBED` event.
 To get an array of all state events, access the `stateEvents` property.
 
 
+### Views
+
+Similar in purpose to SQL views, views allow you to store a function that you can call on at any moment.
+
+Example (using lodash's `maxBy`)
+
+``` javascript
+console.log(store.state); // { people: [{age: 13}, {age: 25}, {age: 20}] }
+
+
+store.createView('oldestPerson', state => {
+  return _.maxBy(state.people, person => person.age);
+});
+
+store.view('oldestPerson'); // {age: 25}
+```
+
 ### Enforcing Types and/or Values
 
 If you want to enforce types and/or values, you can do so by describing the state.
@@ -296,11 +313,11 @@ The state description is made for convenience during development, so any describ
 
 There are 2 important methods: `describeState` and `describe`.
 
-Use the `describeState` method (or the `stateDescription` setter) to initialize the state description. Use `describe` to describe a specific field. 
+Use the `describeState` method (or the `stateDescription` setter) to initialize the state description. Use `describe` to describe a specific field.
 
 ``` javascript
 store.describeState({});
-// or 
+// or
 store.stateDescription = {};
 ```
 

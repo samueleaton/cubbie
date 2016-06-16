@@ -23,7 +23,8 @@ const createStore = () => (() => {
   let frozen = false;
   let initialStateSet = false;
   const eventEmitter = new EventEmitter();
-  
+  const views = {};
+
   /*
   */
   function currentState() {
@@ -275,7 +276,7 @@ const createStore = () => (() => {
   function doesStatePassStateConstraints(state) {
     let constraintErrors = [];
     _.each(stateConstraints, stateConstraintObj => {
-      if (!stateConstraintObj.fn(_.cloneDeep(state))) 
+      if (!stateConstraintObj.fn(_.cloneDeep(state)))
         constraintErrors.push(stateConstraintObj.name);
     });
 
@@ -365,6 +366,23 @@ const createStore = () => (() => {
     return errors;
   }
 
+  /*
+  */
+  function createView(viewName, viewFunction) {
+    if (views[viewName])
+      return console.error(`view "${viewName}" already exists`);
+    if (!_.isFunction(viewFunction))
+      return console.error(`second parameter to createView must be a function`);
+    views[viewName] = viewFunction;
+  }
+
+  /*
+  */
+  function view(viewName, ...args) {
+    if (!views[viewName])
+      return console.error(`view "${viewName}" does not exist`);
+    return views[viewName](currentState(), ...args);
+  }
 
 
   /* CUBBIE
@@ -416,6 +434,13 @@ const createStore = () => (() => {
     emit(...args) {
       eventEmitter.emit(...args);
       return this;
+    },
+    createView(...args) {
+      createView(...args);
+      return this;
+    },
+    view(...args) {
+      return view(...args);
     }
   };
 

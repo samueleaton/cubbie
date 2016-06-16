@@ -28,7 +28,7 @@
     "babel-core": "^6.5.2",
     "babel-loader": "^6.2.3",
     "babel-preset-es2015": "^6.3.13",
-    "screwy": "0.0.24",
+    "screwy": "^1.0.3",
     "webpack": "^1.12.14"
   },
   "dependencies": {

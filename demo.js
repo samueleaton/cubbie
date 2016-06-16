@@ -1,12 +1,15 @@
 import cubbie from './index.js';
+import _ from 'lodash';
 
-window.cubbie = cubbie;
+const store = cubbie.createStore();
 
-cubbie.on('STATE_SET', () => {
+window.store = store;
+
+store.on('STATE_SET', () => {
   console.log('State Set.');
 });
 
-cubbie.describeState({
+store.describeState({
   people: cubbie.describe({ types: ['Array', 'Null'] }),
   currentPanel: cubbie.describe({ type: 'String', values: ['HOME', 'IRON'] }),
   animal: {
@@ -17,7 +20,7 @@ cubbie.describeState({
   }
 });
 
-cubbie.initialState = {
+store.initialState = {
   people: [
     {name: "Sam", age: 25},
     {name: "Jasmine", age: 22},
@@ -30,20 +33,24 @@ cubbie.initialState = {
   currentPanel: 'HOME'
 };
 
-cubbie.on('HELLO', (name, age) => {
+store.on('HELLO', (name, age) => {
   console.log('1: hello ' + name + '. You are ' + age);
 });
-cubbie.on('HELLO', (name, age) => {
+store.on('HELLO', (name, age) => {
   console.log('2: hello ' + name + '. You are ' + age);
 });
-cubbie.once('HELLO', (name, age) => {
+store.once('HELLO', (name, age) => {
   console.log('3: HELLO ' + name + '!!! YOU ARE ' + age + '!!!');
 });
-cubbie.once('HELLO', (name, age) => {
+store.once('HELLO', (name, age) => {
   console.log('4: HELLO ' + name + '!!! YOU ARE ' + age + '!!!');
 });
-cubbie.on('HELLO', (name, age) => {
+store.on('HELLO', (name, age) => {
   console.log('5: hello ' + name + '. You are ' + age);
 });
 
-cubbie.freeze();
+store.freeze();
+
+store.createView('oldestPerson', (state) => {
+  return _.maxBy(state.people, person => person.age);
+})
