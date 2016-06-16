@@ -106,6 +106,16 @@ store.resetState();
 
 See [Reverting the State](docs/REVERTING_STATE.md)
 
+### Purging the State History
+
+If you want to clear the state history, for example to save memory, you can run this method.
+
+It will remove all states from the state history except for the initial state and the current state.
+
+``` javascript
+store.purgeStateHistory();
+```
+
 ### Static State
 
 Internally, static state is a totally separate object from the normal state. It is meant to be set from the beginning of the app and it cannot be changed, unless you totally reset it.

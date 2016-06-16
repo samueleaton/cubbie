@@ -2,7 +2,7 @@
 
 This will revert the state to a previous state in the state history.
 
-**With No Arguments**
+### Revert to Last State
 
 If nothing is passed as an argument, then the current state will be reverted to the most recent previous state:
 
@@ -14,7 +14,7 @@ A successful revert will return `true`.
 
 You can call `revertState` until you get to the initial state, then it will do nothing and return `false`.
 
-**Reverting *n* Time**
+### Reverting *n* Times
 
 Passing an integer to `revertState` will revert the state *n* times:
 
@@ -26,7 +26,7 @@ Passing an integer to `revertState` will still only trigger the STATE_REVERTED e
 
 Thus, `store.revertState(1)` and `store.revertState()` are virtually equivalent.
 
-**Conditional Revert**
+### Conditional Revert
 
 This is definitely the more powerful way to revert the state. You can revert to the most recent state that meets a certain criteria.
 
@@ -42,13 +42,3 @@ store.revertState(state => {
 ```
 
 `revertState` triggers the `STATE_REVERTED` event. See the **Events** section.
-
-### Purging the State History
-
-If you want to clear the state history, for example to save memory, you can run this method.
-
-It will remove all states from the state history except for the initial state and the current state.
-
-``` javascript
-store.purgeStateHistory();
-```
