@@ -69,6 +69,8 @@ store.modifyState(state => {
 
 This is an immutable operation and the newly modified state object will be added as the new state to the state history.
 
+You are essentially modifying a new state object that will become the new state—you are not modifying the "current state".
+
 Example
 
 ``` javascript
@@ -83,7 +85,7 @@ store.modifyState(state => {
 store.stateHistory.length; // then now its 2
 ```
 
-`modifyState` triggers the `STATE_MODIFIED` event. See the **Events** section.
+`modifyState` triggers the `STATE_MODIFIED` event. See [The Event System](docs/EVENT_SYSTEM.md).
 
 `modifyState` will return the new current state.
 
@@ -103,7 +105,7 @@ This will reset the state to the initial state.
 store.resetState();
 ```
 
-`modifyState` triggers the `STATE_RESET` event. See the **Events** section.
+`resetState` triggers the `STATE_RESET` event. See the **Events** section.
 
 ### Reverting the State
 
@@ -116,9 +118,11 @@ Similar in purpose to SQL views, views allow you to store a function that you ca
 Example (using lodash's `maxBy`)
 
 ``` javascript
-console.log(store.state); /* { people: [
-  {name: 'cat', age: 13}, {name: 'sam', age: 25}, {name: 'jas', age: 20}
-]}
+console.log(store.state); /* 
+{ people: [
+    {name: 'cat', age: 13}, {name: 'sam', age: 25}, {name: 'jas', age: 20}
+  ]
+}
 */
 
 
@@ -126,7 +130,7 @@ store.createView('oldestPerson', state => {
   return _.maxBy(state.people, person => person.age);
 });
 
-store.view('oldestPerson'); // {age: 25}
+store.view('oldestPerson'); // {name: 'sam', age: 25}
 ```
 
 ### Purging the State History
