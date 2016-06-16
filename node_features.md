@@ -1,4 +1,4 @@
-# Additional Node Features
+# Additional Features for Node
 
 ### Persisting the Store on Disk
 

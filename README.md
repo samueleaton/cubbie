@@ -157,59 +157,6 @@ It will remove all states from the state history except for the initial state an
 store.purgeStateHistory();
 ```
 
-### Freezing State Structure
-
-The `freeze` method will prevent:
-
-- Adding properties to the state
-- Removing properties from the state
-- Converting object or array to another type
-
-Example
-
-``` javascript
-store.setInitialState({
-  people: [{name: 'sam', age: 25}],
-  currentPerson: {name: 'sam', age: 25}
-});
-
-store.freeze();
-
-store.modifyState(state => {
-  state.company = "Qualtrics";
-}); // aborts, cannot add property to frozen state
-
-store.modifyState(state => {
-  state.people = null;
-}); // aborts, cannot convert array to a non-array or non-object
-
-store.modifyState(state => {
-  state.currentPerson.favoriteColor = null;
-}); // aborts, cannot add property to frozen state
-```
-
-Example
-
-```
-store.setInitialState({
-  people: [{name: 'sam', age: 25}],
-  currentPerson: {name: 'sam', age: 25}
-}).freeze();
-
-/*
-  THESE STILL WORK SUCCESSFULLY
-*/
-
-store.modifyState(state => {
-  state.people.push({name: 'mike', age: 32})
-});
-
-store.modifyState(state => {
-  state.people.currentPerson = {name: 'Jack', age: 24};
-});
-```
-
-
 ### Static State
 
 Internally, static state is a totally separate object from the normal state. It is meant to be set from the beginning of the app and it cannot be changed, unless you totally reset it.
@@ -309,83 +256,14 @@ store.createView('oldestPerson', state => {
 store.view('oldestPerson'); // {age: 25}
 ```
 
+### Freezing the Store
+
+See [Freezing the State Structure](FREEZE_STATE.md)
+
 ### Enforcing Types and/or Values
 
-If you want to enforce types and/or values, you can do so by describing the state.
-
-The state description is made for convenience during development, so any described states will not be enforced or checked if `NODE_ENV=production`.
-
-There are 2 important methods: `describeState` and `describe`.
-
-Use the `describeState` method (or the `stateDescription` setter) to initialize the state description. Use `describe` to describe a specific field.
-
-``` javascript
-store.describeState({});
-// or
-store.stateDescription = {};
-```
-
-Example
-
-``` javascript
-const desc = require('cubbie').describe;
-
-store.describeState({
-  name: desc({ type: 'String' }),
-  age: desc({ types: ['Number', 'Null'] }),
-  pet: {
-    name: desc({ type: 'String' }),
-    kind: desc({ values: ['cat', 'dog'] })
-  }
-});
-
-store.setInitialState({
-  name: 'Sam',
-  age: 25,
-  pet: {
-    name: 'Izzy',
-    kind: 'cat',
-    breed: 'tabby' // not described, so can be ANY value
-  }
-});
-
-store.freeze(); // optional
-
-```
-
-You don't have to describe every single piece of the state.
-
-##### About the `describe` Method
-
-**There are four properties for `describe`:**
-- **`type`** - A single string
-- **`types`** - An array of types
-- **`values`** - An array of values
-- **`of`** - Can specify the types of elements in an array if `type` is `Array`
-
-``` javascript
-// describes state as an array of numbers
-store.describeState({
-  myNumbers: desc({ type: 'Array', of: 'Number' })
-});
-```
-
-`type` and `types` cannot be used in the same description object for the same property.
-
-**The following are valid types to use as a `type` or in `types`:**
-- `'Array'`
-- `'Boolean'`
-- `'Date'`
-- `'Element'`
-- `'Function'`
-- `'Null'`
-- `'Number'`
-- `'Object'`
-- `'RegExp'`
-- `'String'`
-- `'Symbol'`
-- `'Undefined'`
+See [State Description: Enforcing Types and/or Values](STATE_DESCRIPTION.md)
 
 ### Saving State to Disk
 
-See [Node Features](node_features.md)
+See [Additional Features for Node](NODE_FEATURES.md)
