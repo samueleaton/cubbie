@@ -1,4 +1,4 @@
-### Freezing the State Structure
+# Freezing the State Structure
 
 The `freeze` method will prevent:
 

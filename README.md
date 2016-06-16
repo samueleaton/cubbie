@@ -102,60 +102,9 @@ store.resetState();
 
 `modifyState` triggers the `STATE_RESET` event. See the **Events** section.
 
-### Reverting State
+### Reverting the State
 
-This will revert the state to a previous state.
-
-**With No Arguments**
-
-If nothing is passed as an argument, then the current state will be reverted to the most recent previous state:
-
-``` javascript
-store.revertState();
-```
-
-A successful revert will return `true`.
-
-You can call `revertState` until you get to the initial state, then it will do nothing and return `false`.
-
-**Reverting *n* Time**
-
-Passing an integer to `revertState` will revert the state *n* times:
-
-``` javascript
-store.revertState(3); // reverts the state 3 times
-```
-
-Passing an integer to `revertState` will still only trigger the STATE_REVERTED event once, after it has finished reverting *n* times.
-
-Thus, `store.revertState(1)` and `store.revertState()` are virtually equivalent.
-
-**Conditional Revert**
-
-This is definitely the more powerful way to revert the state. You can revert to the most recent state that meets a certain criteria.
-
-Passing a function will iterate over each state, starting with the current state and ending with the initial state, and will revert to the state where the function returns `true`:
-
-``` javascript
-store.revertState(state => {
-  return state.page === 'HOME' && state.loggedIn === true;
-});
-
-// Reverts the state to the last time where
-// page was 'HOME' and where loggedIn was true
-```
-
-`revertState` triggers the `STATE_REVERTED` event. See the **Events** section.
-
-### Purging the State History
-
-If you want to clear the state history, for example to save memory, you can run this method.
-
-It will remove all states from the state history except for the initial state and the current state.
-
-``` javascript
-store.purgeStateHistory();
-```
+See [Reverting the State](docs/REVERTING_STATE.md)
 
 ### Static State
 
@@ -175,70 +124,6 @@ store.staticState = {x: 11, y: 'yee'};
 store.staticState;
 ```
 
-### Events
-
-**Adding Event Listeners**
-
-``` javascript
-store.on('EVENT_NAME', () => {
-    // callback
-});
-```
-
-A single listener can be attached to multiple events by passing the events names as an array. So, for example, to add a listener for all of the "State Events" (Built-in Events) you can do the following:
-
-``` javascript
-store.on(
-  [
-    "STATE_SET",
-    "STATE_RESET",
-    "STATE_REVERTED",
-    "STATE_MODIFIED",
-    "STATE_PROBED",
-    "STATE_COMMITTED",
-    "STATE_RELOADED"
-  ],
-  () => {
-    // code here...
-  }
-)
-```
-
-But because you can get an array of all state events using `store.stateEvents` you could shorten the above code to:
-
-``` javascript
-store.on(store.stateEvents, () => {
-  // code here...
-})
-```
-
-NOTE: You can also use `once` method to only run the handler one time.
-
-**Emitting Events**
-
-``` javascript
-store.emit('EVENT_NAME' [, optional_args]);
-```
-
-Arguments passed to the emitter will be passed as parameters to the event handler.
-
-**Built-in Events**
-
-Custom events can be added and emitted, but there are 5 built-in *State Events*.
-
-- `STATE_SET` - Triggered on `store.initialState = {};` or `store.setInitialState({})`
-- `STATE_RESET` - Triggered on `store.resetState();`
-- `STATE_MODIFIED` - Triggered on `store.modifiyState(() => {});`
-- `STATE_REVERTED` - Triggered on `store.revertState();`
-- `STATE_PROBED` - Triggered on `store.probeState();`
-- `STATE_COMMITED` - *Node Only* Triggered on after committing state to a file using `store.probeState();`
-- `STATE_RELOADED` - *Node Only* Triggered on after loading state from a file using `store.reloadState();`
-
-The only purpose of `probeState()` is to trigger the `STATE_PROBED` event.
-
-To get an array of all state events, access the `stateEvents` property.
-
-
 ### Views
 
 Similar in purpose to SQL views, views allow you to store a function that you can call on at any moment.
@@ -256,14 +141,18 @@ store.createView('oldestPerson', state => {
 store.view('oldestPerson'); // {age: 25}
 ```
 
+### The Event System
+
+See [The Event System](docs/EVENT_SYSTEM.md)
+
 ### Freezing the Store
 
-See [Freezing the State Structure](FREEZE_STATE.md)
+See [Freezing the State Structure](docs/FREEZE_STATE.md)
 
 ### Enforcing Types and/or Values
 
-See [State Description: Enforcing Types and/or Values](STATE_DESCRIPTION.md)
+See [State Description: Enforcing Types and/or Values](docs/STATE_DESCRIPTION.md)
 
 ### Saving State to Disk
 
-See [Additional Features for Node](NODE_FEATURES.md)
+See [Additional Features for Node](docs/NODE_FEATURES.md)
