@@ -41,4 +41,4 @@ store.revertState(state => {
 // page was 'HOME' and where loggedIn was true
 ```
 
-`revertState` triggers the `STATE_REVERTED` event. See the **Events** section.
+`revertState` triggers the `STATE_REVERTED` event. See [The Event System](event_system.md).
