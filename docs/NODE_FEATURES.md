@@ -1,5 +1,11 @@
 # Additional Features for Node
 
+<img width="180" src="https://raw.githubusercontent.com/samueleaton/design/master/cubbie_plus_node.png">    
+
+> Cubbie + Node = code à la mode
+
+<br />
+
 ### Persisting the Store on Disk
 
 To be able to sync the state to disk, define a `file` path when creating a store.

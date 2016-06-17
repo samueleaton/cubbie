@@ -2,7 +2,21 @@
 
 Simple state storage
 
+<br>  
+<p align="center">
+<img width="350" src="https://raw.githubusercontent.com/samueleaton/design/master/cubbie.png">    
+</p>
+<br>  
+
 > State shouldn't be a chore, keep your state in Cubbie's store
+
+<br>  
+
+## The Lowdown
+
+Cubbie allows the creation of state stores. It will keep track of the state history as the state modifies. It is built on an event system that allow anybody to listen for any state event.
+
+If you are using Node.js (e.g. Electron) the state can be synced to a file for persistent storage.
 
 ## Installation
 
@@ -87,7 +101,7 @@ store.modifyState(state => {
 store.stateHistory.length; // then now its 2
 ```
 
-`modifyState` triggers the `STATE_MODIFIED` event. See [The Event System](docs/EVENT_SYSTEM.md).
+`modifyState` triggers the `STATE_MODIFIED` event. See [The Event System](docs/event_system.md).
 
 `modifyState` will return the new current state.
 
@@ -111,7 +125,7 @@ store.resetState();
 
 ### Reverting the State
 
-See [Reverting the State](docs/REVERTING_STATE.md)
+See [Reverting the State](docs/reverting_state.md)
 
 ### Views
 
@@ -165,18 +179,27 @@ store.staticState;
 
 ### The Event System
 
-See [The Event System](docs/EVENT_SYSTEM.md)
+See [The Event System](docs/event_system.md)
 
 ### Freezing the Store
 
-See [Freezing the State Structure](docs/FREEZE_STATE.md)
+See [Freezing the State Structure](docs/freeze_state.md)
 
 ### Enforcing Types and/or Values
 
-See [State Description: Enforcing Types and/or Values](docs/STATE_DESCRIPTION.md)
+See [State Description: Enforcing Types and/or Values](docs/state_description.md)
 
 ### Saving State to Disk
 
 If, for example, you are building an app in Electron and want to save the state to disk, you totes can.
 
-See [Additional Features for Node](docs/NODE_FEATURES.md)
+<img width="180" title="cubbie plus node" alt="cubbie plus node" src="https://raw.githubusercontent.com/samueleaton/design/master/cubbie_plus_node.png"> 
+
+See **[Additional Features for Node](docs/node_features.md)**
+
+
+### Usage with React
+
+<img width="180" title="cubbie plus node" alt="cubbie plus node" src="https://raw.githubusercontent.com/samueleaton/design/master/cubbie_plus_react.png"> 
+
+See **[Using Cubbie With React](docs/cubbie_with_react.md)**
