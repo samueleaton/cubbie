@@ -6,9 +6,8 @@
   "scripts": {
     "transpile": "babel src -d .",
     "bundle": "webpack",
-    "test": "babel test.js > test.transpiled.js",
     "screwy": "screwy",
-    "electron-demo": "electron electron-demo.js"
+    "electron-demo": "electron demos/electron-demo.js"
   },
   "repository": {
     "type": "git",

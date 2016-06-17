@@ -34,6 +34,13 @@ const cubbie = require('cubbie');
 const store = cubbie.createStore();
 ```
 
+Each store you create is independent, each managing its own state history. So if you want multiple <sub>smaller stores</sub> in your app rather than one **large store**, Cubbie will allow it.
+
+``` javascript
+const heroes = cubbie.createStore();
+const villains = cubbie.createStore();
+```
+
 ### Initial State
 
 Before you can start tracking state, you need to set an initial state:
@@ -54,26 +61,15 @@ store.initialState;
 
 ### Current State
 
+Accessing the current state is as simple as accessing the `state` property.
 
 ``` javascript
 store.state;
 ```
 
-This is the same as getting the last element in the array returned from `store.stateHistory`.
-
-### State History
-
-Returns array of all of the states in history since the initial state.
-
-``` javascript
-store.stateHistory;
-```
-
-**Note:** Reverting or resetting the state will remove states from the state history. Modifying the state will append a new state to the state history.
-
 ### Modifying State
 
-Pass a callback where you modify the state object.
+This is the key to Cubbie's simplicity. To modify state just pass a function to `modifyState`. The only parameter of that function is the new state that you get to modify before it is set as the new state. 
 
 ``` javascript
 store.modifyState(state => {
@@ -83,9 +79,9 @@ store.modifyState(state => {
 });
 ```
 
-This is an immutable operation and the newly modified state object will be added as the new state to the state history.
+This is an immutable operation and the newly modified state object will be added as the most recent member of the state history family.
 
-You are essentially modifying a new state object that will become the new state—you are not modifying the "current state".
+You are modifying a new state object that *will become* the new state—*you are not modifying the "current state"*.
 
 Example
 
@@ -104,6 +100,17 @@ store.stateHistory.length; // then now its 2
 `modifyState` triggers the `STATE_MODIFIED` event. See [The Event System](docs/event_system.md).
 
 `modifyState` will return the new current state.
+
+### State History
+
+Returns array of all of the states in history since the initial state.
+
+``` javascript
+store.stateHistory;
+```
+
+**Note:** Reverting or resetting the state will remove states from the state history. Modifying the state will append a new state to the state history.
+
 
 ### Get Previous State
 

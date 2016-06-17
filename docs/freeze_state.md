@@ -8,6 +8,8 @@ The `freeze` method will prevent:
 - Removing properties from the state
 - Converting object or array to another type
 
+*NOTE:* The frozen state is not enforced if `NODE_ENV` is `production`.
+
 Example
 
 ``` javascript
