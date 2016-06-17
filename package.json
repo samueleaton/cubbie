@@ -1,7 +1,7 @@
 {
   "name": "cubbie",
   "version": "0.4.1",
-  "description": "Simple state storage",
+  "description": "Stupid simple state storage",
   "main": "index.js",
   "scripts": {
     "transpile": "babel src -d .",
