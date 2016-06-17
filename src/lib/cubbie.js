@@ -437,9 +437,9 @@ const createStore = (configObj = {}) => (() => {
 
 
 
-  /* CUBBIE
+  /* Store
   */
-  const cubbieMethods = {
+  const storeMethods = {
     describeState(...args) {
       describeState(...args);
       return this;
@@ -504,38 +504,38 @@ const createStore = (configObj = {}) => (() => {
     },
   };
 
-  Object.defineProperty(cubbieMethods, 'state', {
+  Object.defineProperty(storeMethods, 'state', {
     get: () => currentState()
   });
 
-  Object.defineProperty(cubbieMethods, 'staticState', {
+  Object.defineProperty(storeMethods, 'staticState', {
     get: () => getStaticState(),
     set: (obj) => setStaticState(obj)
   });
 
-  Object.defineProperty(cubbieMethods, 'stateEvents', {
+  Object.defineProperty(storeMethods, 'stateEvents', {
     get: () => eventEmitter.stateEvents,
   });
 
-  Object.defineProperty(cubbieMethods, 'previousState', {
+  Object.defineProperty(storeMethods, 'previousState', {
     get: () => previousState(),
   });
 
-  Object.defineProperty(cubbieMethods, 'initialState', {
+  Object.defineProperty(storeMethods, 'initialState', {
     get: () => getInitialState(),
     set: (obj) => setInitialState(obj)
   });
 
-  Object.defineProperty(cubbieMethods, 'stateDescription', {
+  Object.defineProperty(storeMethods, 'stateDescription', {
     get: () => _.map(describedFields => describedFields),
     set: (obj) => describeState(obj)
   });
 
-  Object.defineProperty(cubbieMethods, 'stateHistory', {
+  Object.defineProperty(storeMethods, 'stateHistory', {
     get: () => stateHistory(),
   });
-  return cubbieMethods;
+
+  return storeMethods;
 })();
 
-const cubbie = { createStore, describe };
-export default cubbie;
+module.exports = { createStore, describe };

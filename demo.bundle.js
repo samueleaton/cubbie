@@ -134,10 +134,6 @@
 
 	var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
 	var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
 	  return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
 	} : function (obj) {
@@ -545,9 +541,9 @@
 	      });
 	    }
 
-	    /* CUBBIE
+	    /* Store
 	    */
-	    var cubbieMethods = {
+	    var storeMethods = {
 	      describeState: function describeState() {
 	        _describeState.apply(undefined, arguments);
 	        return this;
@@ -612,13 +608,13 @@
 	      }
 	    };
 
-	    Object.defineProperty(cubbieMethods, 'state', {
+	    Object.defineProperty(storeMethods, 'state', {
 	      get: function get() {
 	        return currentState();
 	      }
 	    });
 
-	    Object.defineProperty(cubbieMethods, 'staticState', {
+	    Object.defineProperty(storeMethods, 'staticState', {
 	      get: function get() {
 	        return getStaticState();
 	      },
@@ -627,19 +623,19 @@
 	      }
 	    });
 
-	    Object.defineProperty(cubbieMethods, 'stateEvents', {
+	    Object.defineProperty(storeMethods, 'stateEvents', {
 	      get: function get() {
 	        return eventEmitter.stateEvents;
 	      }
 	    });
 
-	    Object.defineProperty(cubbieMethods, 'previousState', {
+	    Object.defineProperty(storeMethods, 'previousState', {
 	      get: function get() {
 	        return previousState();
 	      }
 	    });
 
-	    Object.defineProperty(cubbieMethods, 'initialState', {
+	    Object.defineProperty(storeMethods, 'initialState', {
 	      get: function get() {
 	        return getInitialState();
 	      },
@@ -648,7 +644,7 @@
 	      }
 	    });
 
-	    Object.defineProperty(cubbieMethods, 'stateDescription', {
+	    Object.defineProperty(storeMethods, 'stateDescription', {
 	      get: function get() {
 	        return _lodash2.default.map(function (describedFields) {
 	          return describedFields;
@@ -659,17 +655,17 @@
 	      }
 	    });
 
-	    Object.defineProperty(cubbieMethods, 'stateHistory', {
+	    Object.defineProperty(storeMethods, 'stateHistory', {
 	      get: function get() {
 	        return stateHistory();
 	      }
 	    });
-	    return cubbieMethods;
+
+	    return storeMethods;
 	  }();
 	};
 
-	var cubbie = { createStore: createStore, describe: describe };
-	exports.default = cubbie;
+	module.exports = { createStore: createStore, describe: describe };
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
