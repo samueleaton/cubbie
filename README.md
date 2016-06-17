@@ -1,6 +1,6 @@
 # Cubbie
 
-Simple state storage
+Stupid simple state storage
 
 <br>  
 <p align="center">
@@ -14,9 +14,9 @@ Simple state storage
 
 ## The Lowdown
 
-Cubbie allows the creation of state stores. It will keep track of the state history as the state modifies. It is built on an event system that allow anybody to listen for any state event.
+Cubbie allows the creation of state stores. It will keep track of the state history as the state is modified. It is built on an event system that allow anybody to listen for any state event.
 
-If you are using Node.js (e.g. Electron) the state can be synced to a file for persistent storage.
+If you are using Node.js (e.g. Electron) the state can be synced to and from a file for persistent storage.
 
 ## Installation
 
@@ -129,7 +129,7 @@ See [Reverting the State](docs/reverting_state.md)
 
 ### Views
 
-Similar in purpose to SQL views, views allow you to store a function that you can call on at any moment.
+Similar in purpose to SQL views, views allow you to store a function that you can call on at any moment. Its just some good ol' logic abstraction.
 
 Example (using lodash's `maxBy`)
 

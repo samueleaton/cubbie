@@ -1,5 +1,7 @@
 # Freezing the State Structure
 
+> Brrrrrrr...
+
 The `freeze` method will prevent:
 
 - Adding properties to the state
