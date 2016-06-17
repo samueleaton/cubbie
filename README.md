@@ -69,7 +69,7 @@ store.state;
 
 ### Modifying State
 
-This is the key to Cubbie's simplicity. To modify state just pass a function to `modifyState`. The only parameter of that function is the new state that you get to modify before it is set as the new state. 
+This is the key to Cubbie's simplicity. To modify state, just pass a function to `modifyState`. The only parameter of that function is the new state that you get to modify before it is set as the new state. 
 
 ``` javascript
 store.modifyState(state => {

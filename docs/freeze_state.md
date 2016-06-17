@@ -35,7 +35,7 @@ store.modifyState(state => {
 
 Example
 
-```
+``` javascript
 store.setInitialState({
   people: [{name: 'sam', age: 25}],
   currentPerson: {name: 'sam', age: 25}

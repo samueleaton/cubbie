@@ -54,8 +54,8 @@ Custom events can be added and emitted, but there are 5 built-in *State Events*.
 - `STATE_MODIFIED` - Triggered on `store.modifiyState(() => {});`
 - `STATE_REVERTED` - Triggered on `store.revertState();`
 - `STATE_PROBED` - Triggered on `store.probeState();`
-- `STATE_COMMITED` - *Node Only* - Triggered after committing state to a file using `store.probeState();`
-- `STATE_RELOADED` - *Node Only* - Triggered after loading state from a file using `store.reloadState();`
+- `STATE_COMMITED` - Triggered after committing state to a file using `store.commitState();` (*Node.js Only*)
+- `STATE_RELOADED` - Triggered after loading state from a file using `store.reloadState();` (*Node.js Only*)
 
 The only purpose of `probeState()` is to trigger the `STATE_PROBED` event.
 
