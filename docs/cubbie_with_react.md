@@ -212,5 +212,5 @@ export default function NextPersonBtn() {
 };
 ```
 
-As your app gets larger you will want to implemene event namespacing to organize your events. See *[Event Namespacing](event_system.md#event-namespacing)*
+As your app gets larger you will want to implement event namespacing to organize your events. See *[Event Namespacing](event_system.md#event-namespacing)*
 
