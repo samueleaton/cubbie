@@ -60,3 +60,61 @@ Custom events can be added and emitted, but there are 5 built-in *State Events*.
 The only purpose of `probeState()` is to trigger the `STATE_PROBED` event.
 
 To get an array of all state events, access the `stateEvents` property.
+
+### Event Namespacing
+
+Having so many events can get messy, so use namspaces to make things organized. Create a namespace object and then pass it to the `createEventNamspace` method.
+
+``` javascript
+const UserPreferenceEvents = {
+  click: () => {
+    console.log('* clicked UserPreferences');
+  },
+  hover: () => {
+    console.log('* hovered UserPreferences');
+  }
+};
+
+store.setEventNamespace('UserPreferences', UserPreferenceEvents);
+
+store.emit('UserPreferences.click');
+// * dblClicked UserPreferences.EditPersonalInfoBtn
+```
+
+But wait, there's more. Cubbie allows **multiple levels of namespacing** for even better organization and granularity.
+
+``` javascript
+const UserPreferenceEvents = {
+  EditPersonalInfoBtn: {
+    click: () => {
+      console.log('* clicked UserPreferences.EditPersonalInfoBtn');
+    },
+    dblClick: () => {
+      console.log('* dblClicked UserPreferences.EditPersonalInfoBtn');
+    }
+  },
+  SecuritySection: {
+    EditBtn: {
+      click: str => {
+        console.log('* clicked UserPreferences.SecuritySection.EditBtn: ', str);
+      }
+    }
+  }
+};
+
+store.setEventNamespace('UserPreferences', UserPreferenceEvents);
+
+store.emit('UserPreferences.EditPersonalInfoBtn.dblClick');
+// * dblClicked UserPreferences.EditPersonalInfoBtn
+
+store.emit('UserPreferences.SecuritySection.EditBtn.click', 'Yay!');
+// * clicked UserPreferences.SecuritySection.EditBtn: Yay!
+```
+
+### Event Logging
+
+To enable colorful event logging in the console, run `eventLogging(true)` method on the store. To disable, `eventLogging(false)`.
+
+This will log every time an event is emitted.
+
+<img title="cubbie event logging" alt="cubbie event logging" src="https://raw.githubusercontent.com/samueleaton/design/master/cubbie_event_logging.jpg"> 

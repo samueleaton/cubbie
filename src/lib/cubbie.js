@@ -486,6 +486,10 @@ const createStore = (configObj = {}) => (() => {
       eventEmitter.on(...args);
       return this;
     },
+    setEventNamespace(...args) {
+      eventEmitter.setEventNamespace(...args);
+      return this;
+    },
     once(...args) {
       eventEmitter.once(...args);
       return this;
@@ -508,6 +512,9 @@ const createStore = (configObj = {}) => (() => {
     fetch(...args) {
       fetchStore(...args);
       return this;
+    },
+    eventLogging(bool) {
+      eventEmitter.eventLoggingActive(bool);
     }
   };
 
