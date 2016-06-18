@@ -67,10 +67,10 @@ Having so many events can get messy, so use namspaces to make things organized. 
 
 ``` javascript
 const UserPreferenceEvents = {
-  click: () => {
+  click() {
     console.log('* clicked UserPreferences');
   },
-  hover: () => {
+  hover() {
     console.log('* hovered UserPreferences');
   }
 };
