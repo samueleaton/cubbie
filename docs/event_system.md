@@ -86,16 +86,16 @@ But wait, there's more. Cubbie allows **multiple levels of namespacing** for eve
 ``` javascript
 const UserPreferenceEvents = {
   EditPersonalInfoBtn: {
-    click: () => {
+    click() {
       console.log('* clicked UserPreferences.EditPersonalInfoBtn');
     },
-    dblClick: () => {
+    dblClick() {
       console.log('* dblClicked UserPreferences.EditPersonalInfoBtn');
     }
   },
   SecuritySection: {
     EditBtn: {
-      click: str => {
+      click(str) {
         console.log('* clicked UserPreferences.SecuritySection.EditBtn: ', str);
       }
     }
