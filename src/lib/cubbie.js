@@ -2,15 +2,16 @@ import _ from 'lodash';
 import CubbieDescription from './CubbieDescription';
 import EventEmitter from './eventEmitter';
 import fileSystem from './fileSystem';
+import generateUUID from './generateUUID';
 
 /*
 */
-function describe(obj) {
-  if (!_.isPlainObject(obj)) {
+function describe(description) {
+  if (!_.isPlainObject(description)) {
     console.error('Cubbie Error: Must pass object to describe.');
     return null;
   }
-  return new CubbieDescription(obj);
+  return new CubbieDescription(description);
 }
 
 /*
@@ -34,8 +35,18 @@ const createStore = (configObj = {}) => (() => {
 
   /*
   */
+  function createStateObject(state) {
+    return {
+      state: state,
+      createdAt: Date.now(),
+      id: generateUUID()
+    };
+  }
+
+  /*
+  */
   function currentState() {
-    return _.cloneDeep(states[states.length - 1]);
+    return _.cloneDeep(states[states.length - 1].state);
   }
 
   /*
@@ -47,17 +58,17 @@ const createStore = (configObj = {}) => (() => {
 
   /*
   */
-  function revertState(n) {
-    if (typeof n === 'function')
-      return revertStateWhere(n);
+  function revertState(nTimes) {
+    if (typeof nTimes === 'function')
+      return revertStateWhere(nTimes);
 
     if (states.length > 1)
       states.pop();
     else
       return false;
     // recursively revert state
-    if (typeof n === 'number' && n > 1)
-      revertState(n - 1);
+    if (typeof nTimes === 'number' && nTimes > 1)
+      revertState(nTimes - 1);
     else
       eventEmitter.emit('STATE_REVERTED');
 
@@ -66,12 +77,12 @@ const createStore = (configObj = {}) => (() => {
 
   /*
   */
-  function revertStateWhere(cb) {
-    const _history = stateHistory();
+  function revertStateWhere(revertCb) {
+    const _history = getClientFacingStateHistory();
     const _historyLength = _history.length;
 
-    const index = _.findLastIndex(_history, state => {
-      if (cb(state))
+    const index = _.findLastIndex(_history, stateObj => {
+      if (revertCb(stateObj.state))
         return true;
     });
 
@@ -112,45 +123,48 @@ const createStore = (configObj = {}) => (() => {
   */
   function previousState() {
     if (states.length <= 2)
-      return Object.assign({}, states[1]);
+      return Object.assign({}, states[1].state);
     else
-      return Object.assign({}, states[states.length - 2]);
+      return Object.assign({}, states[states.length - 2].state);
   }
 
   /*
   */
-  function getInitialState(obj) {
-    return _.cloneDeep(states[0]);
+  function getInitialState() {
+    return _.cloneDeep(states[0].state);
   }
 
   /*
   */
-  function setInitialState(obj) {
+  function setInitialState(initialState) {
     if (frozen)
       console.error('Cubbie Error: Cubbie is frozen, cannot set initialState again.');
 
-    if (!_.isPlainObject(obj))
+    if (!_.isPlainObject(initialState))
       return console.error('Cubbie Error: Must assign plain object to initialState.');
 
     if (describedFields.length) {
-      if (!doesStateMatchStateDescription(obj))
-        return console.warn('Cubbie Warning: Could not set initialState. State does not match state description.');
+      if (!doesStateMatchStateDescription(initialState)) {
+        return console.warn(
+          'Cubbie Warning: Could not set initialState. State does not match state description.'
+        );
+      }
     }
-    states[0] = obj;
+    states[0] = createStateObject(initialState);
     initialStateSet = true;
     eventEmitter.emit('STATE_SET');
   }
 
   /*
   */
-  function setNewState(obj) {
-    states.push(obj);
+  function setNewState(newState) {
+    states.push(createStateObject(newState));
   }
 
   /*
   */
-  function stateHistory() {
-    return states.map(x => _.cloneDeep(x));
+  function getClientFacingStateHistory() {
+    return states.map(stateObj => _.cloneDeep(stateObj.state));
   }
 
   /*
@@ -161,15 +175,13 @@ const createStore = (configObj = {}) => (() => {
 
   /*
   */
-  function setStaticState(obj) {
-    if (!_.isPlainObject(obj)) {
+  function setStaticState(staticState) {
+    if (!_.isPlainObject(staticState)) {
       console.error('Cubbie Error: Must assign object to staticState.');
       return null;
     }
 
-    staticStateObj = _.cloneDeep(obj);
-
-    return cubbie;
+    staticStateObj = _.cloneDeep(staticState);
   }
 
   /*
@@ -187,21 +199,25 @@ const createStore = (configObj = {}) => (() => {
   /*
   */
   function describeState(stateSlice, objPath) {
-    const statePath = _.isArray(objPath) ? objPath : [] ;
-    _.forOwn(stateSlice, (v, k) => {
+    const statePath = _.isArray(objPath) ? objPath : [];
+    _.forOwn(stateSlice, (val, key) => {
       if (states.length) {
-        if (_.isUndefined(_.get(currentState(), _.concat(statePath, k))))
-          return console.warn('Cubbie Error: "' + k + '" is not defined in the currentState');
+        if (_.isUndefined(_.get(currentState(), _.concat(statePath, key))))
+          return console.warn('Cubbie Error: "' + key + '" is not defined in the currentState');
       }
 
-      if (CubbieDescription.isCubbieDescription(v)) {
-        v.statePath = _.concat(statePath, k);
-        describedFields.push(v);
+      if (CubbieDescription.isCubbieDescription(val)) {
+        val.statePath = _.concat(statePath, key);
+        describedFields.push(val);
       }
-      else if (_.isPlainObject(v))
-        describeState(v, _.concat(statePath, k));
-      else
-        console.warn('Cubbie Error: "' + k + '" must be plain object or cubbie.describe() in "describeState"');
+      else if (_.isPlainObject(val))
+        describeState(val, _.concat(statePath, key));
+      else {
+        console.warn(
+          'Cubbie Error: "' + key +
+          '" must be plain object or cubbie.describe() in "describeState"'
+        );
+      }
     });
   }
 
@@ -214,16 +230,19 @@ const createStore = (configObj = {}) => (() => {
       const stateVal = _.get(state, cubbieDescription.statePath);
 
       if (cubbieDescription.type) {
-        let isValidType = CubbieDescription.doesValueMatchType(stateVal, cubbieDescription);
+        const isValidType = CubbieDescription.doesValueMatchType(stateVal, cubbieDescription);
 
         if (!isValidType) {
           stateMatchErrors++;
           if (cubbieDescription.type === 'ARRAY' && _.isArray(stateVal) && cubbieDescription.of) {
             console.error(
-              'Invalid type in ' + cubbieDescription.type + ' of ' + cubbieDescription.of + '. The value at state.' +
+              'Invalid type in ' + cubbieDescription.type + ' of ' +
+              cubbieDescription.of + '. The value at state.' +
               cubbieDescription.statePath.join('.') +
-              ' (' + _.find(
-                stateVal, v => !CubbieDescription.doesValueMatchType(v, cubbieDescription.of)) +
+              ' (' +
+              _.find(
+                stateVal, val => !CubbieDescription.doesValueMatchType(val, cubbieDescription.of)
+              ) +
               ') is not of type ' + cubbieDescription.of
             );
           }
@@ -239,7 +258,9 @@ const createStore = (configObj = {}) => (() => {
       }
 
       if (cubbieDescription.types) {
-        let isValidType = CubbieDescription.doesValueMatchType(stateVal, cubbieDescription.types);
+        const isValidType = CubbieDescription.doesValueMatchType(
+          stateVal, cubbieDescription.types
+        );
 
         if (!isValidType) {
           stateMatchErrors++;
@@ -259,7 +280,7 @@ const createStore = (configObj = {}) => (() => {
             cubbieDescription.statePath.join('.') +
             ' must be: ' + cubbieDescription.values.map(desc => {
               if (desc === null) return 'null';
-              else if (desc === undefined) return 'undefined';
+              else if (typeof desc === 'undefined') return 'undefined';
               else if (typeof desc === 'string') return `"${desc}"`;
               else return desc;
             }).join(' or ')
@@ -281,7 +302,7 @@ const createStore = (configObj = {}) => (() => {
   /*
   */
   function doesStatePassStateConstraints(state) {
-    let constraintErrors = [];
+    const constraintErrors = [];
     _.each(stateConstraints, stateConstraintObj => {
       if (!stateConstraintObj.fn(_.cloneDeep(state)))
         constraintErrors.push(stateConstraintObj.name);
@@ -316,14 +337,13 @@ const createStore = (configObj = {}) => (() => {
   /*
   */
   function setKeyTree(tree, state) {
-    _.forOwn(state, (v, k) => {
-      if (_.isObjectLike(v)) {
-        tree[k] = {};
-        setKeyTree(tree[k], state[k]);
+    _.forOwn(state, (val, key) => {
+      if (_.isObjectLike(val)) {
+        tree[key] = {};
+        setKeyTree(tree[key], state[key]);
       }
-      else {
-        tree[k] = true;
-      }
+      else
+        tree[key] = true;
     });
   }
 
@@ -345,21 +365,20 @@ const createStore = (configObj = {}) => (() => {
       return errors;
     }
 
-    _.forOwn(tree, (v, k) => {
-      if (_.isObjectLike(v) && !_.isObjectLike(state[k])) {
+    _.forOwn(tree, (val, key) => {
+      if (_.isObjectLike(val) && !_.isObjectLike(state[key])) {
         console.warn(
           `Cubbie Warning: Cannot convert frozen array or object to another type.`,
-          `Attempted to convert frozen property "${k}" to ${!state[k] ? state[k] : typeof state[k]}`
+          `Attempted to convert frozen property "${key}" to ${
+            state[key] ? typeof state[key] : state[key]
+          }`
         );
         console.warn();
         errors = true;
         return;
       }
-      if (_.isObjectLike(v)) {
-        if (wasStateRestructured(tree[k], state[k])) {
-          errors = true;
-        }
-      }
+      if (_.isObjectLike(val) && wasStateRestructured(tree[key], state[key]))
+        errors = true;
     });
 
     if (errors)
@@ -393,48 +412,54 @@ const createStore = (configObj = {}) => (() => {
 
   /*
   */
-  function commitState(format = '') {
+  function commitStore() {
     if (!fileSystem.isFsAvailable())
       return console.error('file system is not available in this environment');
     if (typeof configObj.file !== 'string')
       return console.error('file path has not been set or is invalid');
-    fileSystem.commitState(
-      eventEmitter, states[states.length - 1], configObj, format
-    );
+    fileSystem.commitStore(eventEmitter, states, configObj);
   }
 
   /*
   */
-  function reloadState() {
+  function reloadStore() {
     if (!fileSystem.isFsAvailable())
       return console.error('file system is not available in this environment');
     if (typeof configObj.file !== 'string')
       return console.error('file path has not been set or is invalid');
-    fileSystem.reloadState(configObj, state => {
-      if (frozen && wasStateRestructured(keyTree, state)) {
-        console.warn('Cubbie Warning: Reload aborted.');
-        return currentState();
-      }
+    fileSystem.reloadStore(configObj, store => {
+      console.log('do statehistory merge here');
+      /*
+        do complicated store merge here
 
-      if (process && process.env && process.env.NODE_ENV !== 'production') {
-        if (describedFields.length && !doesStateMatchStateDescription(state)) {
-          console.warn('Cubbie Warning: State does not match description. Reload aborted.');
-          return currentState();
-        }
+        it doesn't need to be complicated:
+          just make on big array (
+            combining current state history and reloaded state history
+          ) then make array unique by state id,
+          then order by state timestamp
+      */
+      // if (frozen && wasStateRestructured(keyTree, state)) {
+      //   console.warn('Cubbie Warning: Reload aborted.');
+      //   return currentState();
+      // }
 
-        if (stateConstraints.length && !doesStatePassStateConstraints(state)) {
-          console.warn('Cubbie Warning: State does not pass constraint. Reload aborted.');
-          return currentState();
-        }
-      }
+      // if (process && process.env && process.env.NODE_ENV !== 'production') {
+      //   if (describedFields.length && !doesStateMatchStateDescription(state)) {
+      //     console.warn('Cubbie Warning: State does not match description. Reload aborted.');
+      //     return currentState();
+      //   }
 
-      setNewState(state);
-      eventEmitter.emit('STATE_RELOADED');
-      return currentState();
+      //   if (stateConstraints.length && !doesStatePassStateConstraints(state)) {
+      //     console.warn('Cubbie Warning: State does not pass constraint. Reload aborted.');
+      //     return currentState();
+      //   }
+      // }
+
+      // setNewState(state);
+      // eventEmitter.emit('STATE_RELOADED');
+      // return currentState();
     });
   }
-
-
 
 
   /* Store
@@ -494,14 +519,14 @@ const createStore = (configObj = {}) => (() => {
     view(...args) {
       return view(...args);
     },
-    commitState(...args) {
-      commitState(...args);
+    commitStore(...args) {
+      commitStore(...args);
       return this;
     },
-    reloadState(...args) {
-      reloadState(...args);
+    reloadStore(...args) {
+      reloadStore(...args);
       return this;
-    },
+    }
   };
 
   Object.defineProperty(storeMethods, 'state', {
@@ -510,29 +535,33 @@ const createStore = (configObj = {}) => (() => {
 
   Object.defineProperty(storeMethods, 'staticState', {
     get: () => getStaticState(),
-    set: (obj) => setStaticState(obj)
+    set: staticState => setStaticState(staticState)
   });
 
   Object.defineProperty(storeMethods, 'stateEvents', {
-    get: () => eventEmitter.stateEvents,
+    get: () => eventEmitter.stateEvents
   });
 
   Object.defineProperty(storeMethods, 'previousState', {
-    get: () => previousState(),
+    get: () => previousState()
   });
 
   Object.defineProperty(storeMethods, 'initialState', {
     get: () => getInitialState(),
-    set: (obj) => setInitialState(obj)
+    set: initialState => setInitialState(initialState)
   });
 
   Object.defineProperty(storeMethods, 'stateDescription', {
-    get: () => _.map(describedFields => describedFields),
-    set: (obj) => describeState(obj)
+    get: () => _.map(describedFields, field => field),
+    set: stateDescription => describeState(stateDescription)
   });
 
   Object.defineProperty(storeMethods, 'stateHistory', {
-    get: () => stateHistory(),
+    get: () => getClientFacingStateHistory()
+  });
+
+  Object.defineProperty(storeMethods, 'rawStateHistory', {
+    get: () => states
   });
 
   return storeMethods;

@@ -56,9 +56,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var store = _index2.default.createStore({
-	  file: './store.cubbie'
-	});
+	var store = _index2.default.createStore();
 
 	window.store = store;
 
@@ -72,9 +70,7 @@
 	  animal: {
 	    info: _index2.default.describe({ type: 'Array' })
 	  },
-	  currentPerson: {
-	    name: _index2.default.describe({ values: ['Sam'] })
-	  }
+	  currentPerson: _index2.default.describe({ type: 'NUMBER' })
 	});
 
 	store.initialState = {
@@ -82,7 +78,7 @@
 	  animal: {
 	    info: [null]
 	  },
-	  currentPerson: { name: "Sam", age: 25 },
+	  currentPerson: 0,
 	  currentPanel: 'HOME'
 	};
 
@@ -108,6 +104,10 @@
 	  return _lodash2.default.maxBy(state.people, function (person) {
 	    return person.age;
 	  });
+	});
+
+	store.createView('currentPerson', function (state) {
+	  return state.people[state.currentPerson];
 	});
 
 /***/ },
@@ -156,18 +156,22 @@
 
 	var _fileSystem2 = _interopRequireDefault(_fileSystem);
 
+	var _generateUUID = __webpack_require__(11);
+
+	var _generateUUID2 = _interopRequireDefault(_generateUUID);
+
 	function _interopRequireDefault(obj) {
 	  return obj && obj.__esModule ? obj : { default: obj };
 	}
 
 	/*
 	*/
-	function describe(obj) {
-	  if (!_lodash2.default.isPlainObject(obj)) {
+	function describe(description) {
+	  if (!_lodash2.default.isPlainObject(description)) {
 	    console.error('Cubbie Error: Must pass object to describe.');
 	    return null;
 	  }
-	  return new _CubbieDescription2.default(obj);
+	  return new _CubbieDescription2.default(description);
 	}
 
 	/*
@@ -192,8 +196,18 @@
 
 	    /*
 	    */
+	    function createStateObject(state) {
+	      return {
+	        state: state,
+	        createdAt: Date.now(),
+	        id: (0, _generateUUID2.default)()
+	      };
+	    }
+
+	    /*
+	    */
 	    function currentState() {
-	      return _lodash2.default.cloneDeep(states[states.length - 1]);
+	      return _lodash2.default.cloneDeep(states[states.length - 1].state);
 	    }
 
 	    /*
@@ -205,24 +219,24 @@
 
 	    /*
 	    */
-	    function _revertState(n) {
-	      if (typeof n === 'function') return revertStateWhere(n);
+	    function _revertState(nTimes) {
+	      if (typeof nTimes === 'function') return revertStateWhere(nTimes);
 
 	      if (states.length > 1) states.pop();else return false;
 	      // recursively revert state
-	      if (typeof n === 'number' && n > 1) _revertState(n - 1);else eventEmitter.emit('STATE_REVERTED');
+	      if (typeof nTimes === 'number' && nTimes > 1) _revertState(nTimes - 1);else eventEmitter.emit('STATE_REVERTED');
 
 	      return true;
 	    }
 
 	    /*
 	    */
-	    function revertStateWhere(cb) {
-	      var _history = stateHistory();
+	    function revertStateWhere(revertCb) {
+	      var _history = getClientFacingStateHistory();
 	      var _historyLength = _history.length;
 
-	      var index = _lodash2.default.findLastIndex(_history, function (state) {
-	        if (cb(state)) return true;
+	      var index = _lodash2.default.findLastIndex(_history, function (stateObj) {
+	        if (revertCb(stateObj.state)) return true;
 	      });
 
 	      if (index === -1) return false;
@@ -261,41 +275,43 @@
 	    /*
 	    */
 	    function previousState() {
-	      if (states.length <= 2) return Object.assign({}, states[1]);else return Object.assign({}, states[states.length - 2]);
+	      if (states.length <= 2) return Object.assign({}, states[1].state);else return Object.assign({}, states[states.length - 2].state);
 	    }
 
 	    /*
 	    */
-	    function getInitialState(obj) {
-	      return _lodash2.default.cloneDeep(states[0]);
+	    function getInitialState() {
+	      return _lodash2.default.cloneDeep(states[0].state);
 	    }
 
 	    /*
 	    */
-	    function _setInitialState(obj) {
+	    function _setInitialState(initialState) {
 	      if (frozen) console.error('Cubbie Error: Cubbie is frozen, cannot set initialState again.');
 
-	      if (!_lodash2.default.isPlainObject(obj)) return console.error('Cubbie Error: Must assign plain object to initialState.');
+	      if (!_lodash2.default.isPlainObject(initialState)) return console.error('Cubbie Error: Must assign plain object to initialState.');
 
 	      if (describedFields.length) {
-	        if (!doesStateMatchStateDescription(obj)) return console.warn('Cubbie Warning: Could not set initialState. State does not match state description.');
+	        if (!doesStateMatchStateDescription(initialState)) {
+	          return console.warn('Cubbie Warning: Could not set initialState. State does not match state description.');
+	        }
 	      }
-	      states[0] = obj;
+	      states[0] = createStateObject(initialState);
 	      initialStateSet = true;
 	      eventEmitter.emit('STATE_SET');
 	    }
 
 	    /*
 	    */
-	    function setNewState(obj) {
-	      states.push(obj);
+	    function setNewState(newState) {
+	      states.push(createStateObject(newState));
 	    }
 
 	    /*
 	    */
-	    function stateHistory() {
-	      return states.map(function (x) {
-	        return _lodash2.default.cloneDeep(x);
+	    function getClientFacingStateHistory() {
+	      return states.map(function (stateObj) {
+	        return _lodash2.default.cloneDeep(stateObj.state);
 	      });
 	    }
 
@@ -307,15 +323,13 @@
 
 	    /*
 	    */
-	    function setStaticState(obj) {
-	      if (!_lodash2.default.isPlainObject(obj)) {
+	    function setStaticState(staticState) {
+	      if (!_lodash2.default.isPlainObject(staticState)) {
 	        console.error('Cubbie Error: Must assign object to staticState.');
 	        return null;
 	      }
 
-	      staticStateObj = _lodash2.default.cloneDeep(obj);
-
-	      return cubbie;
+	      staticStateObj = _lodash2.default.cloneDeep(staticState);
 	    }
 
 	    /*
@@ -334,15 +348,17 @@
 	    */
 	    function _describeState(stateSlice, objPath) {
 	      var statePath = _lodash2.default.isArray(objPath) ? objPath : [];
-	      _lodash2.default.forOwn(stateSlice, function (v, k) {
+	      _lodash2.default.forOwn(stateSlice, function (val, key) {
 	        if (states.length) {
-	          if (_lodash2.default.isUndefined(_lodash2.default.get(currentState(), _lodash2.default.concat(statePath, k)))) return console.warn('Cubbie Error: "' + k + '" is not defined in the currentState');
+	          if (_lodash2.default.isUndefined(_lodash2.default.get(currentState(), _lodash2.default.concat(statePath, key)))) return console.warn('Cubbie Error: "' + key + '" is not defined in the currentState');
 	        }
 
-	        if (_CubbieDescription2.default.isCubbieDescription(v)) {
-	          v.statePath = _lodash2.default.concat(statePath, k);
-	          describedFields.push(v);
-	        } else if (_lodash2.default.isPlainObject(v)) _describeState(v, _lodash2.default.concat(statePath, k));else console.warn('Cubbie Error: "' + k + '" must be plain object or cubbie.describe() in "describeState"');
+	        if (_CubbieDescription2.default.isCubbieDescription(val)) {
+	          val.statePath = _lodash2.default.concat(statePath, key);
+	          describedFields.push(val);
+	        } else if (_lodash2.default.isPlainObject(val)) _describeState(val, _lodash2.default.concat(statePath, key));else {
+	          console.warn('Cubbie Error: "' + key + '" must be plain object or cubbie.describe() in "describeState"');
+	        }
 	      });
 	    }
 
@@ -360,8 +376,8 @@
 	          if (!isValidType) {
 	            stateMatchErrors++;
 	            if (cubbieDescription.type === 'ARRAY' && _lodash2.default.isArray(stateVal) && cubbieDescription.of) {
-	              console.error('Invalid type in ' + cubbieDescription.type + ' of ' + cubbieDescription.of + '. The value at state.' + cubbieDescription.statePath.join('.') + ' (' + _lodash2.default.find(stateVal, function (v) {
-	                return !_CubbieDescription2.default.doesValueMatchType(v, cubbieDescription.of);
+	              console.error('Invalid type in ' + cubbieDescription.type + ' of ' + cubbieDescription.of + '. The value at state.' + cubbieDescription.statePath.join('.') + ' (' + _lodash2.default.find(stateVal, function (val) {
+	                return !_CubbieDescription2.default.doesValueMatchType(val, cubbieDescription.of);
 	              }) + ') is not of type ' + cubbieDescription.of);
 	            } else {
 	              console.error('Invalid type. Set state.' + cubbieDescription.statePath.join('.') + ' = ' + stateVal + ' (' + _CubbieDescription2.default.getType(stateVal) + '). Must be of type ' + cubbieDescription.type);
@@ -381,7 +397,7 @@
 	        if (cubbieDescription.values) {
 	          if (!_lodash2.default.includes(cubbieDescription.values, stateVal)) {
 	            console.error('Invalid value "' + stateVal + '". state.' + cubbieDescription.statePath.join('.') + ' must be: ' + cubbieDescription.values.map(function (desc) {
-	              if (desc === null) return 'null';else if (desc === undefined) return 'undefined';else if (typeof desc === 'string') return '"' + desc + '"';else return desc;
+	              if (desc === null) return 'null';else if (typeof desc === 'undefined') return 'undefined';else if (typeof desc === 'string') return '"' + desc + '"';else return desc;
 	            }).join(' or '));
 	            stateMatchErrors++;
 	          }
@@ -431,13 +447,11 @@
 	    /*
 	    */
 	    function setKeyTree(tree, state) {
-	      _lodash2.default.forOwn(state, function (v, k) {
-	        if (_lodash2.default.isObjectLike(v)) {
-	          tree[k] = {};
-	          setKeyTree(tree[k], state[k]);
-	        } else {
-	          tree[k] = true;
-	        }
+	      _lodash2.default.forOwn(state, function (val, key) {
+	        if (_lodash2.default.isObjectLike(val)) {
+	          tree[key] = {};
+	          setKeyTree(tree[key], state[key]);
+	        } else tree[key] = true;
 	      });
 	    }
 
@@ -458,18 +472,14 @@
 	        return errors;
 	      }
 
-	      _lodash2.default.forOwn(tree, function (v, k) {
-	        if (_lodash2.default.isObjectLike(v) && !_lodash2.default.isObjectLike(state[k])) {
-	          console.warn('Cubbie Warning: Cannot convert frozen array or object to another type.', 'Attempted to convert frozen property "' + k + '" to ' + (!state[k] ? state[k] : _typeof(state[k])));
+	      _lodash2.default.forOwn(tree, function (val, key) {
+	        if (_lodash2.default.isObjectLike(val) && !_lodash2.default.isObjectLike(state[key])) {
+	          console.warn('Cubbie Warning: Cannot convert frozen array or object to another type.', 'Attempted to convert frozen property "' + key + '" to ' + (state[key] ? _typeof(state[key]) : state[key]));
 	          console.warn();
 	          errors = true;
 	          return;
 	        }
-	        if (_lodash2.default.isObjectLike(v)) {
-	          if (wasStateRestructured(tree[k], state[k])) {
-	            errors = true;
-	          }
-	        }
+	        if (_lodash2.default.isObjectLike(val) && wasStateRestructured(tree[key], state[key])) errors = true;
 	      });
 
 	      if (errors) return errors;
@@ -504,40 +514,47 @@
 
 	    /*
 	    */
-	    function _commitState() {
-	      var format = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
-
+	    function _commitStore() {
 	      if (!_fileSystem2.default.isFsAvailable()) return console.error('file system is not available in this environment');
 	      if (typeof configObj.file !== 'string') return console.error('file path has not been set or is invalid');
-	      _fileSystem2.default.commitState(eventEmitter, states[states.length - 1], configObj, format);
+	      _fileSystem2.default.commitStore(eventEmitter, states, configObj);
 	    }
 
 	    /*
 	    */
-	    function _reloadState() {
+	    function _reloadStore() {
 	      if (!_fileSystem2.default.isFsAvailable()) return console.error('file system is not available in this environment');
 	      if (typeof configObj.file !== 'string') return console.error('file path has not been set or is invalid');
-	      _fileSystem2.default.reloadState(configObj, function (state) {
-	        if (frozen && wasStateRestructured(keyTree, state)) {
-	          console.warn('Cubbie Warning: Reload aborted.');
-	          return currentState();
-	        }
+	      _fileSystem2.default.reloadStore(configObj, function (store) {
+	        console.log('do statehistory merge here');
+	        /*
+	          do complicated store merge here
+	           it doesn't need to be complicated:
+	            just make on big array (
+	              combining current state history and reloaded state history
+	            ) then make array unique by state id,
+	            then order by state timestamp
+	        */
+	        // if (frozen && wasStateRestructured(keyTree, state)) {
+	        //   console.warn('Cubbie Warning: Reload aborted.');
+	        //   return currentState();
+	        // }
 
-	        if (process && process.env && process.env.NODE_ENV !== 'production') {
-	          if (describedFields.length && !doesStateMatchStateDescription(state)) {
-	            console.warn('Cubbie Warning: State does not match description. Reload aborted.');
-	            return currentState();
-	          }
+	        // if (process && process.env && process.env.NODE_ENV !== 'production') {
+	        //   if (describedFields.length && !doesStateMatchStateDescription(state)) {
+	        //     console.warn('Cubbie Warning: State does not match description. Reload aborted.');
+	        //     return currentState();
+	        //   }
 
-	          if (stateConstraints.length && !doesStatePassStateConstraints(state)) {
-	            console.warn('Cubbie Warning: State does not pass constraint. Reload aborted.');
-	            return currentState();
-	          }
-	        }
+	        //   if (stateConstraints.length && !doesStatePassStateConstraints(state)) {
+	        //     console.warn('Cubbie Warning: State does not pass constraint. Reload aborted.');
+	        //     return currentState();
+	        //   }
+	        // }
 
-	        setNewState(state);
-	        eventEmitter.emit('STATE_RELOADED');
-	        return currentState();
+	        // setNewState(state);
+	        // eventEmitter.emit('STATE_RELOADED');
+	        // return currentState();
 	      });
 	    }
 
@@ -598,12 +615,12 @@
 	      view: function view() {
 	        return _view.apply(undefined, arguments);
 	      },
-	      commitState: function commitState() {
-	        _commitState.apply(undefined, arguments);
+	      commitStore: function commitStore() {
+	        _commitStore.apply(undefined, arguments);
 	        return this;
 	      },
-	      reloadState: function reloadState() {
-	        _reloadState.apply(undefined, arguments);
+	      reloadStore: function reloadStore() {
+	        _reloadStore.apply(undefined, arguments);
 	        return this;
 	      }
 	    };
@@ -618,8 +635,8 @@
 	      get: function get() {
 	        return getStaticState();
 	      },
-	      set: function set(obj) {
-	        return setStaticState(obj);
+	      set: function set(staticState) {
+	        return setStaticState(staticState);
 	      }
 	    });
 
@@ -639,25 +656,31 @@
 	      get: function get() {
 	        return getInitialState();
 	      },
-	      set: function set(obj) {
-	        return _setInitialState(obj);
+	      set: function set(initialState) {
+	        return _setInitialState(initialState);
 	      }
 	    });
 
 	    Object.defineProperty(storeMethods, 'stateDescription', {
 	      get: function get() {
-	        return _lodash2.default.map(function (describedFields) {
-	          return describedFields;
+	        return _lodash2.default.map(describedFields, function (field) {
+	          return field;
 	        });
 	      },
-	      set: function set(obj) {
-	        return _describeState(obj);
+	      set: function set(stateDescription) {
+	        return _describeState(stateDescription);
 	      }
 	    });
 
 	    Object.defineProperty(storeMethods, 'stateHistory', {
 	      get: function get() {
-	        return stateHistory();
+	        return getClientFacingStateHistory();
+	      }
+	    });
+
+	    Object.defineProperty(storeMethods, 'rawStateHistory', {
+	      get: function get() {
+	        return states;
 	      }
 	    });
 
@@ -17238,7 +17261,7 @@
 	  }return function (Constructor, protoProps, staticProps) {
 	    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
 	  };
-	}();
+	}(); /* eslint-disable complexity */
 
 	var _lodash = __webpack_require__(4);
 
@@ -17300,8 +17323,8 @@
 	      } else {
 	        if (typeObj.type === 'ARRAY') {
 	          if (!_lodash2.default.isArray(value)) return false;
-	          if (typeObj.of && _lodash2.default.some(value, function (v) {
-	            return !CubbieDescription.doesValueMatchType(v, typeObj.of);
+	          if (typeObj.of && _lodash2.default.some(value, function (val) {
+	            return !CubbieDescription.doesValueMatchType(val, typeObj.of);
 	          })) return false;
 	        } else if (typeObj.type === 'BOOLEAN') {
 	          if (!_lodash2.default.isBoolean(value)) return false;
@@ -17331,8 +17354,8 @@
 	    }
 	  }, {
 	    key: 'isCubbieDescription',
-	    value: function isCubbieDescription(obj) {
-	      return obj instanceof CubbieDescription || obj.constructor === CubbieDescription;
+	    value: function isCubbieDescription(descObj) {
+	      return descObj instanceof CubbieDescription || descObj.constructor === CubbieDescription;
 	    }
 	  }, {
 	    key: 'getType',
@@ -17346,31 +17369,31 @@
 	    }
 	  }]);
 
-	  function CubbieDescription(obj) {
+	  function CubbieDescription(descriptionObj) {
 	    _classCallCheck(this, CubbieDescription);
 
-	    if (!_lodash2.default.isPlainObject(obj)) return console.error('Must pass object to "describe"');
-	    if (!obj.type && !obj.types && !obj.values) return console.error('Must specify type, types, or values with "describe"');
-	    if (obj.type && obj.types) return console.error('Cannot specify both "type" and "types" with "describe"');
-	    if (obj.type && _lodash2.default.isString(obj.type)) {
-	      if (!CubbieDescription.isValidType(obj.type)) return console.error('Invalid type: ' + obj.type);
-	      this.type = obj.type.toUpperCase();
-	      if (this.type === 'ARRAY' && _lodash2.default.isString(obj.of)) {
-	        if (!CubbieDescription.isValidType(obj.of)) return console.error('Invalid type: ' + obj.of);
-	        this.of = obj.of.toUpperCase();
+	    if (!_lodash2.default.isPlainObject(descriptionObj)) return console.error('Must pass object to "describe"');
+	    if (!descriptionObj.type && !descriptionObj.types && !descriptionObj.values) return console.error('Must specify type, types, or values with "describe"');
+	    if (descriptionObj.type && descriptionObj.types) return console.error('Cannot specify both "type" and "types" with "describe"');
+	    if (descriptionObj.type && _lodash2.default.isString(descriptionObj.type)) {
+	      if (!CubbieDescription.isValidType(descriptionObj.type)) return console.error('Invalid type: ' + descriptionObj.type);
+	      this.type = descriptionObj.type.toUpperCase();
+	      if (this.type === 'ARRAY' && _lodash2.default.isString(descriptionObj.of)) {
+	        if (!CubbieDescription.isValidType(descriptionObj.of)) return console.error('Invalid type: ' + descriptionObj.of);
+	        this.of = descriptionObj.of.toUpperCase();
 	      }
 	    }
-	    if (obj.types && _lodash2.default.isArray(obj.types)) {
-	      if (!obj.types.length) return console.error('Cannot pass an empty array to "types"');
-	      var invalidType = _lodash2.default.find(obj.types, function (type) {
+	    if (descriptionObj.types && _lodash2.default.isArray(descriptionObj.types)) {
+	      if (!descriptionObj.types.length) return console.error('Cannot pass an empty array to "types"');
+	      var invalidType = _lodash2.default.find(descriptionObj.types, function (type) {
 	        return !CubbieDescription.isValidType(type);
 	      });
 	      if (invalidType) return console.error('Invalid type: ' + invalidType);
-	      this.types = obj.types;
+	      this.types = descriptionObj.types;
 	    }
-	    if (!_lodash2.default.isUndefined(obj.values)) {
-	      if (_lodash2.default.isArray(obj.values)) {
-	        if (obj.values.length) this.values = obj.values;else console.error('"values" cannot be an empty array in "describe"');
+	    if (!_lodash2.default.isUndefined(descriptionObj.values)) {
+	      if (_lodash2.default.isArray(descriptionObj.values)) {
+	        if (descriptionObj.values.length) this.values = descriptionObj.values;else console.error('"values" cannot be an empty array in "describe"');
 	      } else console.error('"values" must be an array in "describe"');
 	    }
 
@@ -17400,8 +17423,9 @@
 	  }return function (Constructor, protoProps, staticProps) {
 	    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
 	  };
-	}(); /* EVENT EMITTER
-	     */
+	}(); /* eslint-disable id-length */
+	/* EVENT EMITTER
+	*/
 
 	var _lodash = __webpack_require__(4);
 
@@ -17424,13 +17448,13 @@
 	    _classCallCheck(this, CubbieEventEmitter);
 
 	    this.events = {
-	      'STATE_SET': [],
-	      'STATE_RESET': [],
-	      'STATE_REVERTED': [],
-	      'STATE_MODIFIED': [],
-	      'STATE_PROBED': [],
-	      'STATE_COMMITTED': [],
-	      'STATE_RELOADED': []
+	      STATE_SET: [],
+	      STATE_RESET: [],
+	      STATE_REVERTED: [],
+	      STATE_MODIFIED: [],
+	      STATE_PROBED: [],
+	      STATE_COMMITTED: [],
+	      STATE_RELOADED: []
 	    };
 	    this.stateEvents = ['STATE_SET', 'STATE_RESET', 'STATE_REVERTED', 'STATE_MODIFIED', 'STATE_PROBED', 'STATE_COMMITTED', 'STATE_RELOADED'];
 	    _lodash2.default.each(this.stateEvents, function (evt) {
@@ -17440,33 +17464,35 @@
 
 	  _createClass(CubbieEventEmitter, [{
 	    key: 'on',
-	    value: function on(arg, cb) {
+	    value: function on(arg, evtCb) {
 	      var _this2 = this;
 
 	      var args = _lodash2.default.isArray(arg) ? arg : [arg];
-	      if (typeof cb !== 'function') return console.error('Cubbie Error: Last param to "on" must be of type "function".');
+	      if (typeof evtCb !== 'function') return console.error('Cubbie Error: Last param to "on" must be of type "function".');
 	      _lodash2.default.each(args, function (evt) {
 	        if (!_lodash2.default.isArray(_this2.events[evt])) _this2.events[evt] = [];
-	        _this2.events[evt].push(cb);
+	        _this2.events[evt].push(evtCb);
 	      });
 	    }
 	  }, {
 	    key: 'once',
-	    value: function once(arg, cb) {
+	    value: function once(arg, evtCb) {
 	      var _this3 = this;
 
 	      var args = _lodash2.default.isArray(arg) ? arg : [arg];
-	      if (typeof cb !== 'function') return console.error('Cubbie Error: Last param to "on" must be of type "function".');
+	      if (typeof evtCb !== 'function') return console.error('Cubbie Error: Last param to "on" must be of type "function".');
 	      _lodash2.default.each(args, function (evt) {
 	        if (!_lodash2.default.isArray(_this3.events[evt])) _this3.events[evt] = [];
 
-	        var callback = function callback() {
-	          cb.apply(undefined, arguments);
-	          var index = _this3.events[evt].indexOf(callback);
-	          _this3.events[evt][index] = null; // after running, make callback null
+	        var onceCb = function onceCb() {
+	          evtCb.apply(undefined, arguments);
+	          var index = _this3.events[evt].indexOf(onceCb);
+
+	          // after running, make callback null
+	          _this3.events[evt][index] = null;
 	        };
 
-	        _this3.events[evt].push(callback);
+	        _this3.events[evt].push(onceCb);
 	      });
 	    }
 	  }, {
@@ -17476,11 +17502,10 @@
 	        args[_key - 1] = arguments[_key];
 	      }
 
-	      if (!this.events[evt]) return;else {
-	        _lodash2.default.each(this.events[evt], function (cb) {
-	          if (cb) return cb.apply(undefined, args);
-	        });
-	      }
+	      if (!this.events[evt]) return;
+	      _lodash2.default.each(this.events[evt], function (evtCb) {
+	        if (evtCb) return evtCb.apply(undefined, args);
+	      });
 	    }
 	  }]);
 
@@ -17519,10 +17544,10 @@
 	  return (typeof _fs2.default === 'undefined' ? 'undefined' : _typeof(_fs2.default)) === 'object' && typeof _fs2.default.readFile === 'function' && typeof _fs2.default.writeFile === 'function' && _fs2.default.readFile.length === 3 && _fs2.default.writeFile.length === 4;
 	}
 
-	function stringifyState(state, configObj, format) {
+	function stringifyStateHistory(state, configObj) {
 	  var stateStr = void 0;
 	  try {
-	    stateStr = JSON.stringify(state, null, format);
+	    stateStr = JSON.stringify(state, null, '  ');
 	  } catch (stringifyErr) {
 	    return console.error(stringifyErr);
 	  }
@@ -17532,24 +17557,25 @@
 	  } else return stateStr;
 	}
 
-	function parseState(state, configObj) {
-	  var stateStr = void 0;
+	function parseStateHistory(stateHist, configObj) {
+	  var stateHistStr = void 0;
 	  if (_crypter2.default.isEncryptionEnabled(configObj)) {
-	    stateStr = _crypter2.default.decrypt(state, configObj.encryption.secret, configObj.encryption.algorithm);
-	  } else stateStr = state;
+	    stateHistStr = _crypter2.default.decrypt(stateHist, configObj.encryption.secret, configObj.encryption.algorithm);
+	  } else stateHistStr = stateHist;
 
-	  var stateObj = void 0;
+	  var stateHistObj = void 0;
 	  try {
-	    stateObj = JSON.parse(stateStr);
+	    stateHistObj = JSON.parse(stateHistStr);
 	  } catch (parseError) {
 	    return console.error(parseError);
 	  }
-	  return stateObj;
+	  return stateHistObj;
 	}
 
 	function initStorage(configObj) {
+	  /* eslint-disable no-sync */
 	  try {
-	    var contents = _fs2.default.readFileSync(configObj.file, 'utf8');
+	    _fs2.default.readFileSync(configObj.file, 'utf8');
 	  } catch (readError) {
 	    try {
 	      _fs2.default.writeFileSync(configObj.file, '', 'utf8');
@@ -17557,14 +17583,13 @@
 	      console.error('Could not initialize file storage');
 	    }
 	  }
+	  /* eslint-enable no-sync */
 	}
 
-	function commitState(eventEmitter, state, configObj) {
-	  var format = arguments.length <= 3 || arguments[3] === undefined ? '' : arguments[3];
-
+	function commitStore(eventEmitter, stateHist, configObj) {
 	  try {
-	    var stringifiedState = stringifyState(state, configObj, format);
-	    _fs2.default.writeFile(configObj.file, stringifiedState + '\n', 'utf8', function (writeError) {
+	    var stringifiedStateHist = stringifyStateHistory(stateHist, configObj);
+	    _fs2.default.writeFile(configObj.file, stringifiedStateHist + '\n', 'utf8', function (writeError) {
 	      if (writeError) return console.error(writeError);
 	      eventEmitter.emit('STATE_COMMITTED');
 	    });
@@ -17573,11 +17598,11 @@
 	  }
 	}
 
-	function reloadState(configObj, reloadCb) {
+	function reloadStore(configObj, reloadCb) {
 	  try {
 	    _fs2.default.readFile(configObj.file, 'utf8', function (readErr, fileData) {
 	      if (readErr) return console.error(readErr);
-	      reloadCb(parseState(fileData.trim(), configObj));
+	      reloadCb(parseStateHistory(fileData.trim(), configObj));
 	    });
 	  } catch (readErr) {
 	    console.error(readErr);
@@ -17585,7 +17610,7 @@
 	}
 
 	module.exports = {
-	  isFsAvailable: isFsAvailable, initStorage: initStorage, commitState: commitState, reloadState: reloadState
+	  isFsAvailable: isFsAvailable, initStorage: initStorage, commitStore: commitStore, reloadStore: reloadStore
 	};
 
 /***/ },
@@ -17643,6 +17668,27 @@
 	};
 
 	exports.default = crypter;
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = generateUUID;
+	function generateUUID() {
+	  var timestamp = Date.now();
+	  if (window.performance && typeof window.performance.now === 'function') timestamp += performance.now();
+	  var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (char) {
+	    var randChar = (timestamp + Math.random() * 16) % 16 | 0;
+	    timestamp = Math.floor(timestamp / 16);
+	    return (char === 'x' ? randChar : randChar & 0x3 | 0x8).toString(16);
+	  });
+	  return uuid;
+	}
 
 /***/ }
 /******/ ]);

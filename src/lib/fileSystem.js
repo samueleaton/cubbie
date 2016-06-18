@@ -11,10 +11,10 @@ function isFsAvailable() {
   );
 }
 
-function stringifyState(state, configObj, format) {
+function stringifyStateHistory(state, configObj) {
   let stateStr;
   try {
-    stateStr = JSON.stringify(state, null, format);
+    stateStr = JSON.stringify(state, null, '  ');
   }
   catch (stringifyErr) {
     return console.error(stringifyErr);
@@ -29,29 +29,30 @@ function stringifyState(state, configObj, format) {
     return stateStr;
 }
 
-function parseState(state, configObj) {
-  let stateStr;
+function parseStateHistory(stateHist, configObj) {
+  let stateHistStr;
   if (crypter.isEncryptionEnabled(configObj)) {
-    stateStr = crypter.decrypt(
-      state, configObj.encryption.secret, configObj.encryption.algorithm
+    stateHistStr = crypter.decrypt(
+      stateHist, configObj.encryption.secret, configObj.encryption.algorithm
     );
   }
   else
-    stateStr = state;
+    stateHistStr = stateHist;
   
-  let stateObj;
+  let stateHistObj;
   try {
-    stateObj = JSON.parse(stateStr);
+    stateHistObj = JSON.parse(stateHistStr);
   }
   catch (parseError) {
     return console.error(parseError);
   }
-  return stateObj;
+  return stateHistObj;
 }
 
 function initStorage(configObj) {
+  /* eslint-disable no-sync */
   try {
-    const contents = fs.readFileSync(configObj.file, 'utf8');
+    fs.readFileSync(configObj.file, 'utf8');
   }
   catch (readError) {
     try {
@@ -61,12 +62,13 @@ function initStorage(configObj) {
       console.error('Could not initialize file storage');
     }
   }
+  /* eslint-enable no-sync */
 }
 
-function commitState(eventEmitter, state, configObj, format = '') {
+function commitStore(eventEmitter, stateHist, configObj) {
   try {
-    const stringifiedState = stringifyState(state, configObj, format);
-    fs.writeFile(configObj.file, stringifiedState + '\n', 'utf8', writeError => {
+    const stringifiedStateHist = stringifyStateHistory(stateHist, configObj);
+    fs.writeFile(configObj.file, stringifiedStateHist + '\n', 'utf8', writeError => {
       if (writeError)
         return console.error(writeError);
       eventEmitter.emit('STATE_COMMITTED');
@@ -77,12 +79,12 @@ function commitState(eventEmitter, state, configObj, format = '') {
   }
 }
 
-function reloadState(configObj, reloadCb) {
+function reloadStore(configObj, reloadCb) {
   try {
     fs.readFile(configObj.file, 'utf8', (readErr, fileData) => {
       if (readErr)
         return console.error(readErr);
-      reloadCb(parseState(fileData.trim(), configObj));
+      reloadCb(parseStateHistory(fileData.trim(), configObj));
     });
   }
   catch (readErr) {
@@ -91,5 +93,5 @@ function reloadState(configObj, reloadCb) {
 }
 
 module.exports = {
-  isFsAvailable, initStorage, commitState, reloadState
+  isFsAvailable, initStorage, commitStore, reloadStore
 };

@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import _ from 'lodash';
 
 export default class CubbieDescription {
@@ -60,7 +61,7 @@ export default class CubbieDescription {
           return false;
         if (
           typeObj.of &&
-          _.some(value, v => !CubbieDescription.doesValueMatchType(v, typeObj.of))
+          _.some(value, val => !CubbieDescription.doesValueMatchType(val, typeObj.of))
         )
           return false;
       }
@@ -111,9 +112,9 @@ export default class CubbieDescription {
       return true;
     }
   }
-  static isCubbieDescription(obj) {
+  static isCubbieDescription(descObj) {
     return (
-      obj instanceof CubbieDescription || obj.constructor === CubbieDescription
+      descObj instanceof CubbieDescription || descObj.constructor === CubbieDescription
     );
   }
   static getType(value) {
@@ -161,37 +162,37 @@ export default class CubbieDescription {
     ], type.toUpperCase());
   }
 
-  constructor(obj) {
-    if (!_.isPlainObject(obj))
+  constructor(descriptionObj) {
+    if (!_.isPlainObject(descriptionObj))
       return console.error('Must pass object to "describe"');
-    if (!obj.type && !obj.types && !obj.values)
+    if (!descriptionObj.type && !descriptionObj.types && !descriptionObj.values)
       return console.error('Must specify type, types, or values with "describe"');
-    if (obj.type && obj.types)
+    if (descriptionObj.type && descriptionObj.types)
       return console.error('Cannot specify both "type" and "types" with "describe"');
-    if (obj.type && _.isString(obj.type)) {
-      if (!CubbieDescription.isValidType(obj.type))
-        return console.error('Invalid type: ' + obj.type);
-      this.type = obj.type.toUpperCase();
-      if (this.type === 'ARRAY' && _.isString(obj.of)) {
-        if (!CubbieDescription.isValidType(obj.of))
-          return console.error('Invalid type: ' + obj.of);
-        this.of = obj.of.toUpperCase();
+    if (descriptionObj.type && _.isString(descriptionObj.type)) {
+      if (!CubbieDescription.isValidType(descriptionObj.type))
+        return console.error('Invalid type: ' + descriptionObj.type);
+      this.type = descriptionObj.type.toUpperCase();
+      if (this.type === 'ARRAY' && _.isString(descriptionObj.of)) {
+        if (!CubbieDescription.isValidType(descriptionObj.of))
+          return console.error('Invalid type: ' + descriptionObj.of);
+        this.of = descriptionObj.of.toUpperCase();
       }
     }
-    if (obj.types && _.isArray(obj.types)) {
-      if (!obj.types.length)
+    if (descriptionObj.types && _.isArray(descriptionObj.types)) {
+      if (!descriptionObj.types.length)
         return console.error('Cannot pass an empty array to "types"');
       const invalidType = _.find(
-        obj.types, type => !CubbieDescription.isValidType(type)
+        descriptionObj.types, type => !CubbieDescription.isValidType(type)
       );
       if (invalidType)
         return console.error('Invalid type: ' + invalidType);
-      this.types = obj.types;
+      this.types = descriptionObj.types;
     }
-    if (!_.isUndefined(obj.values)) {
-      if (_.isArray(obj.values)) {
-        if (obj.values.length)
-          this.values = obj.values;
+    if (!_.isUndefined(descriptionObj.values)) {
+      if (_.isArray(descriptionObj.values)) {
+        if (descriptionObj.values.length)
+          this.values = descriptionObj.values;
         else
           console.error('"values" cannot be an empty array in "describe"');
       }

@@ -5,9 +5,11 @@
   "main": "index.js",
   "scripts": {
     "transpile": "babel src -d .",
+    "pretranspile": "npm run -s lint",
     "bundle": "webpack",
     "screwy": "screwy",
-    "electron-demo": "electron demos/electron-demo.js"
+    "electron-demo": "electron demos/electron-demo.js",
+    "lint": "eslint --max-warnings 10 -c .eslintrc.json src/"
   },
   "repository": {
     "type": "git",
@@ -28,6 +30,7 @@
     "babel-core": "^6.5.2",
     "babel-loader": "^6.2.3",
     "babel-preset-es2015": "^6.3.13",
+    "eslint": "^2.13.0",
     "screwy": "^1.0.3",
     "webpack": "^1.12.14"
   },

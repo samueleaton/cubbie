@@ -23,6 +23,6 @@ const crypter = {
       typeof configObj.encryption.secret === 'string'
     );
   }
-}
+};
 
 export default crypter;

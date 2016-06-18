@@ -1,9 +1,7 @@
-import cubbie from './index.js';
+import cubbie from '../index.js';
 import _ from 'lodash';
 
-const store = cubbie.createStore({
-  file: './store.cubbie'
-});
+const store = cubbie.createStore();
 
 window.store = store;
 
@@ -17,9 +15,7 @@ store.describeState({
   animal: {
     info: cubbie.describe({ type: 'Array' })
   },
-  currentPerson: {
-    name: cubbie.describe({ values: ['Sam'] })
-  }
+  currentPerson: cubbie.describe({ type: 'NUMBER' })
 });
 
 store.initialState = {
@@ -31,7 +27,7 @@ store.initialState = {
   animal: {
     info: [null]
   },
-  currentPerson: {name: "Sam", age: 25},
+  currentPerson: 0,
   currentPanel: 'HOME'
 };
 
@@ -53,6 +49,10 @@ store.on('HELLO', (name, age) => {
 
 store.freeze();
 
-store.createView('oldestPerson', (state) => {
+store.createView('oldestPerson', state => {
   return _.maxBy(state.people, person => person.age);
+})
+
+store.createView('currentPerson', state => {
+  return state.people[state.currentPerson];
 })
