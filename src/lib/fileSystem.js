@@ -14,7 +14,8 @@ function isFsAvailable() {
 function stringifyStateHistory(state, configObj) {
   let stateStr;
   try {
-    stateStr = JSON.stringify(state, null, '  ');
+    const pretty = configObj.pretty === true;
+    stateStr = JSON.stringify(state, null, pretty && 2);
   }
   catch (stringifyErr) {
     return console.error(stringifyErr);
