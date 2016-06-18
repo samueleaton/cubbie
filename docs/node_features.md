@@ -30,7 +30,7 @@ store.setInitialState({/*...*/});
 store.commitStore();
 ```
 
-This will trigger the `STATE_COMMITTED` event.
+This will trigger the `STORE_COMMITTED` event.
 
 **Loading the Store from a File**
 
@@ -52,7 +52,7 @@ Every state in Cubbie's stores is given a unique UUID and a timestamp when it is
 
 Run `store.rawStateHistory` to see how Cubbie stores states internally.
 
-This will trigger the `STATE_RELOADED` event.
+This will trigger the `STORE_FETCHED` event.
 
 NOTE: State descriptions are not enforced with stores fetched from a file.
 
