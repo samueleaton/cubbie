@@ -156,9 +156,9 @@
 
 	var _fileSystem2 = _interopRequireDefault(_fileSystem);
 
-	var _generateUUID = __webpack_require__(11);
+	var _CubbieState = __webpack_require__(11);
 
-	var _generateUUID2 = _interopRequireDefault(_generateUUID);
+	var _CubbieState2 = _interopRequireDefault(_CubbieState);
 
 	function _interopRequireDefault(obj) {
 	  return obj && obj.__esModule ? obj : { default: obj };
@@ -197,11 +197,7 @@
 	    /*
 	    */
 	    function createStateObject(state) {
-	      return {
-	        state: state,
-	        createdAt: Date.now(),
-	        id: (0, _generateUUID2.default)()
-	      };
+	      return new _CubbieState2.default({ state: state });
 	    }
 
 	    /*
@@ -514,7 +510,7 @@
 
 	    /*
 	    */
-	    function _commitStore() {
+	    function commitStore() {
 	      if (!_fileSystem2.default.isFsAvailable()) return console.error('file system is not available in this environment');
 	      if (typeof configObj.file !== 'string') return console.error('file path has not been set or is invalid');
 	      _fileSystem2.default.commitStore(eventEmitter, states, configObj);
@@ -522,39 +518,30 @@
 
 	    /*
 	    */
-	    function _reloadStore() {
+	    function fetchStore() {
 	      if (!_fileSystem2.default.isFsAvailable()) return console.error('file system is not available in this environment');
 	      if (typeof configObj.file !== 'string') return console.error('file path has not been set or is invalid');
-	      _fileSystem2.default.reloadStore(configObj, function (store) {
-	        console.log('do statehistory merge here');
-	        /*
-	          do complicated store merge here
-	           it doesn't need to be complicated:
-	            just make on big array (
-	              combining current state history and reloaded state history
-	            ) then make array unique by state id,
-	            then order by state timestamp
-	        */
-	        // if (frozen && wasStateRestructured(keyTree, state)) {
-	        //   console.warn('Cubbie Warning: Reload aborted.');
-	        //   return currentState();
-	        // }
+	      _fileSystem2.default.fetchStore(configObj, function (store) {
+	        console.log('do statehistory merge here: ', store);
 
-	        // if (process && process.env && process.env.NODE_ENV !== 'production') {
-	        //   if (describedFields.length && !doesStateMatchStateDescription(state)) {
-	        //     console.warn('Cubbie Warning: State does not match description. Reload aborted.');
-	        //     return currentState();
-	        //   }
+	        var invalidState = _lodash2.default.find(store, function (state) {
+	          return !state || !state.id || !state.timestamp;
+	        });
 
-	        //   if (stateConstraints.length && !doesStatePassStateConstraints(state)) {
-	        //     console.warn('Cubbie Warning: State does not pass constraint. Reload aborted.');
-	        //     return currentState();
-	        //   }
-	        // }
+	        if (invalidState) return console.error('Cubbie Error: Cannot import. Found invalid state: ', invalidState);
 
-	        // setNewState(state);
-	        // eventEmitter.emit('STATE_RELOADED');
-	        // return currentState();
+	        states = (0, _lodash2.default)(states).concat(store).uniqBy(function (state) {
+	          return state.id;
+	        }).sortBy(function (state) {
+	          return state.timestamp;
+	        }).map(function (state) {
+	          return _CubbieState2.default.toCubbieState(state);
+	        }).value();
+
+	        console.log('states: ', states);
+
+	        eventEmitter.emit('STORE_FETCHED');
+	        return currentState();
 	      });
 	    }
 
@@ -615,12 +602,12 @@
 	      view: function view() {
 	        return _view.apply(undefined, arguments);
 	      },
-	      commitStore: function commitStore() {
-	        _commitStore.apply(undefined, arguments);
+	      commit: function commit() {
+	        commitStore.apply(undefined, arguments);
 	        return this;
 	      },
-	      reloadStore: function reloadStore() {
-	        _reloadStore.apply(undefined, arguments);
+	      fetch: function fetch() {
+	        fetchStore.apply(undefined, arguments);
 	        return this;
 	      }
 	    };
@@ -17453,10 +17440,10 @@
 	      STATE_REVERTED: [],
 	      STATE_MODIFIED: [],
 	      STATE_PROBED: [],
-	      STATE_COMMITTED: [],
-	      STATE_RELOADED: []
+	      STORE_COMMITTED: [],
+	      STORE_FETCHED: []
 	    };
-	    this.stateEvents = ['STATE_SET', 'STATE_RESET', 'STATE_REVERTED', 'STATE_MODIFIED', 'STATE_PROBED', 'STATE_COMMITTED', 'STATE_RELOADED'];
+	    this.stateEvents = ['STATE_SET', 'STATE_RESET', 'STATE_REVERTED', 'STATE_MODIFIED', 'STATE_PROBED', 'STORE_COMMITTED', 'STORE_FETCHED'];
 	    _lodash2.default.each(this.stateEvents, function (evt) {
 	      _this.events[evt] = [];
 	    });
@@ -17569,7 +17556,7 @@
 	  } catch (parseError) {
 	    return console.error(parseError);
 	  }
-	  return stateHistObj;
+	  return stateHistObj || [];
 	}
 
 	function initStorage(configObj) {
@@ -17598,7 +17585,7 @@
 	  }
 	}
 
-	function reloadStore(configObj, reloadCb) {
+	function fetchStore(configObj, reloadCb) {
 	  try {
 	    _fs2.default.readFile(configObj.file, 'utf8', function (readErr, fileData) {
 	      if (readErr) return console.error(readErr);
@@ -17610,7 +17597,7 @@
 	}
 
 	module.exports = {
-	  isFsAvailable: isFsAvailable, initStorage: initStorage, commitStore: commitStore, reloadStore: reloadStore
+	  isFsAvailable: isFsAvailable, initStorage: initStorage, commitStore: commitStore, fetchStore: fetchStore
 	};
 
 /***/ },
@@ -17671,6 +17658,70 @@
 
 /***/ },
 /* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () {
+	  function defineProperties(target, props) {
+	    for (var i = 0; i < props.length; i++) {
+	      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+	    }
+	  }return function (Constructor, protoProps, staticProps) {
+	    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	  };
+	}(); /* eslint-disable complexity */
+
+	var _lodash = __webpack_require__(4);
+
+	var _lodash2 = _interopRequireDefault(_lodash);
+
+	var _generateUUID = __webpack_require__(12);
+
+	var _generateUUID2 = _interopRequireDefault(_generateUUID);
+
+	function _interopRequireDefault(obj) {
+	  return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	function _classCallCheck(instance, Constructor) {
+	  if (!(instance instanceof Constructor)) {
+	    throw new TypeError("Cannot call a class as a function");
+	  }
+	}
+
+	var CubbieState = function () {
+	  _createClass(CubbieState, null, [{
+	    key: 'toCubbieState',
+	    value: function toCubbieState(stateObj) {
+	      if (stateObj instanceof CubbieState) return stateObj;else if (_lodash2.default.isPlainObject(stateObj)) return new CubbieState(stateObj);else throw new Error('Cannot convert to CubbieState. Invalid Format.');
+	    }
+	  }]);
+
+	  function CubbieState(_ref) {
+	    var state = _ref.state;
+	    var id = _ref.id;
+	    var timestamp = _ref.timestamp;
+
+	    _classCallCheck(this, CubbieState);
+
+	    if (!_lodash2.default.isPlainObject(state)) throw new Error('CubbieState must be a plain object');
+	    this.id = id || (0, _generateUUID2.default)();
+	    this.timestamp = timestamp || Date.now();
+	    this.state = state;
+	  }
+
+	  return CubbieState;
+	}();
+
+	exports.default = CubbieState;
+
+/***/ },
+/* 12 */
 /***/ function(module, exports) {
 
 	'use strict';

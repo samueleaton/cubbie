@@ -6,17 +6,24 @@
 <body>
 
 <script type="text/javascript">
-  const cubbie = require('./index.js');
+  const cubbie = require('../index.js');
   const _ = require('lodash');
 
   const store = cubbie.createStore({
-    file: './store.cubbie',
-    encryption: {
-      secret: 'mr_poopy_butthole'
-    }
+    file: './store.cubbie'
+    // ,
+    // encryption: {
+    //   secret: 'mr_poopy_butthole'
+    // }
   });
 
   window.store = store;
+
+  store.on(store.stateEvents, (x, y) => {
+    console.log('\nstate event emitted');
+    console.log('x: ', x);
+    console.log('y: ', y);
+  })
 
   store.on('STATE_SET', () => {
     console.log('State Set.');
@@ -28,41 +35,23 @@
     animal: {
       info: cubbie.describe({ type: 'Array' })
     },
-    currentPerson: {
-      name: cubbie.describe({ values: ['Sam'] })
-    }
+    currentPerson: cubbie.describe({ type: 'NUMBER' })
   });
 
-  store.initialState = {
-    people: [
-      {name: "Sam", age: 25},
-      {name: "Jasmine", age: 22},
-      {name: "Nick", age: 21}
-    ],
-    animal: {
-      info: [null]
-    },
-    currentPerson: {name: "Sam", age: 25},
-    currentPanel: 'HOME'
-  };
+  // store.initialState = {
+  //   people: [
+  //     {name: "Sam", age: 25},
+  //     {name: "Jasmine", age: 22},
+  //     {name: "Nick", age: 21}
+  //   ],
+  //   animal: {
+  //     info: [null]
+  //   },
+  //   currentPerson: 0,
+  //   currentPanel: 'HOME'
+  // };
 
-  store.on('HELLO', (name, age) => {
-    console.log('1: hello ' + name + '. You are ' + age);
-  });
-  store.on('HELLO', (name, age) => {
-    console.log('2: hello ' + name + '. You are ' + age);
-  });
-  store.once('HELLO', (name, age) => {
-    console.log('3: HELLO ' + name + '!!! YOU ARE ' + age + '!!!');
-  });
-  store.once('HELLO', (name, age) => {
-    console.log('4: HELLO ' + name + '!!! YOU ARE ' + age + '!!!');
-  });
-  store.on('HELLO', (name, age) => {
-    console.log('5: hello ' + name + '. You are ' + age);
-  });
-
-  store.freeze();
+  // store.freeze();
 
   store.createView('oldestPerson', (state) => {
     return _.maxBy(state.people, person => person.age);

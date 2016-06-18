@@ -111,6 +111,7 @@ store.stateHistory;
 
 **Note:** Reverting or resetting the state will remove states from the state history. Modifying the state will append a new state to the state history.
 
+To get the absolute raw state history (which includes each state timestamp and id) use `store.rawStateHistory`. So if for some reason you want to see the date/time when each state was created, this is how you can access that information.
 
 ### Get Previous State
 
@@ -122,7 +123,7 @@ store.previousState;
 
 ### Resetting State
 
-This will reset the state to the initial state.
+This will reset the state to the initial state (the first state in the state history).
 
 ``` javascript
 store.resetState();
@@ -160,7 +161,7 @@ store.view('oldestPerson'); // {name: 'sam', age: 25}
 
 If you want to clear the state history, for example to save memory, you can run this method.
 
-It will remove all states from the state history except for the initial state and the current state. The current state will remain intact and no state events will be triggered.
+It will remove all states from the state history **except for the initial state and the current state**. The current state will remain intact and no state events will be triggered.
 
 ``` javascript
 store.purgeStateHistory();

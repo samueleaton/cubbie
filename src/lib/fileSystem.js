@@ -46,7 +46,7 @@ function parseStateHistory(stateHist, configObj) {
   catch (parseError) {
     return console.error(parseError);
   }
-  return stateHistObj;
+  return stateHistObj || [];
 }
 
 function initStorage(configObj) {
@@ -79,7 +79,7 @@ function commitStore(eventEmitter, stateHist, configObj) {
   }
 }
 
-function reloadStore(configObj, reloadCb) {
+function fetchStore(configObj, reloadCb) {
   try {
     fs.readFile(configObj.file, 'utf8', (readErr, fileData) => {
       if (readErr)
@@ -93,5 +93,5 @@ function reloadStore(configObj, reloadCb) {
 }
 
 module.exports = {
-  isFsAvailable, initStorage, commitStore, reloadStore
+  isFsAvailable, initStorage, commitStore, fetchStore
 };

@@ -18,8 +18,8 @@ store.on(
     "STATE_REVERTED",
     "STATE_MODIFIED",
     "STATE_PROBED",
-    "STATE_COMMITTED",
-    "STATE_RELOADED"
+    "STORE_COMMITTED",
+    "STORE_FETCHED"
   ],
   () => {
     // code here...
@@ -54,8 +54,8 @@ Custom events can be added and emitted, but there are 5 built-in *State Events*.
 - `STATE_MODIFIED` - Triggered on `store.modifiyState(() => {});`
 - `STATE_REVERTED` - Triggered on `store.revertState();`
 - `STATE_PROBED` - Triggered on `store.probeState();`
-- `STATE_COMMITED` - Triggered after committing state to a file using `store.commitState();` (*Node.js Only*)
-- `STATE_RELOADED` - Triggered after loading state from a file using `store.reloadState();` (*Node.js Only*)
+- `STORE_COMMITTED` - Triggered after committing the store to a file using `store.commitStore();` (*Node.js Only*)
+- `STORE_FETCHED` - Triggered after fetching the store from a file using `store.fetchStore();` (*Node.js Only*)
 
 The only purpose of `probeState()` is to trigger the `STATE_PROBED` event.
 

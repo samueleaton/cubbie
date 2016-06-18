@@ -2,7 +2,7 @@ import _ from 'lodash';
 import CubbieDescription from './CubbieDescription';
 import EventEmitter from './eventEmitter';
 import fileSystem from './fileSystem';
-import generateUUID from './generateUUID';
+import CubbieState from './CubbieState';
 
 /*
 */
@@ -17,7 +17,7 @@ function describe(description) {
 /*
 */
 const createStore = (configObj = {}) => (() => {
-  const states = [];
+  let states = [];
   let staticStateObj = {};
   const describedFields = [];
   const stateConstraints = [];
@@ -36,11 +36,7 @@ const createStore = (configObj = {}) => (() => {
   /*
   */
   function createStateObject(state) {
-    return {
-      state: state,
-      createdAt: Date.now(),
-      id: generateUUID()
-    };
+    return new CubbieState({ state });
   }
 
   /*
@@ -82,7 +78,7 @@ const createStore = (configObj = {}) => (() => {
     const _historyLength = _history.length;
 
     const index = _.findLastIndex(_history, stateObj => {
-      if (revertCb(stateObj.state))
+      if (revertCb(stateObj))
         return true;
     });
 
@@ -422,42 +418,28 @@ const createStore = (configObj = {}) => (() => {
 
   /*
   */
-  function reloadStore() {
+  function fetchStore() {
     if (!fileSystem.isFsAvailable())
       return console.error('file system is not available in this environment');
     if (typeof configObj.file !== 'string')
       return console.error('file path has not been set or is invalid');
-    fileSystem.reloadStore(configObj, store => {
-      console.log('do statehistory merge here');
-      /*
-        do complicated store merge here
+    fileSystem.fetchStore(configObj, store => {
+      const invalidState = _.find(
+        store, state => !state || !state.id || !state.timestamp
+      );
 
-        it doesn't need to be complicated:
-          just make on big array (
-            combining current state history and reloaded state history
-          ) then make array unique by state id,
-          then order by state timestamp
-      */
-      // if (frozen && wasStateRestructured(keyTree, state)) {
-      //   console.warn('Cubbie Warning: Reload aborted.');
-      //   return currentState();
-      // }
+      if (invalidState)
+        return console.error('Cubbie Error: Cannot import. Found invalid state: ', invalidState);
 
-      // if (process && process.env && process.env.NODE_ENV !== 'production') {
-      //   if (describedFields.length && !doesStateMatchStateDescription(state)) {
-      //     console.warn('Cubbie Warning: State does not match description. Reload aborted.');
-      //     return currentState();
-      //   }
+      states = _(states)
+        .concat(store)
+        .uniqBy(state => state.id)
+        .sortBy(state => state.timestamp)
+        .map(state => CubbieState.toCubbieState(state))
+        .value();
 
-      //   if (stateConstraints.length && !doesStatePassStateConstraints(state)) {
-      //     console.warn('Cubbie Warning: State does not pass constraint. Reload aborted.');
-      //     return currentState();
-      //   }
-      // }
-
-      // setNewState(state);
-      // eventEmitter.emit('STATE_RELOADED');
-      // return currentState();
+      eventEmitter.emit('STORE_FETCHED');
+      return currentState();
     });
   }
 
@@ -519,12 +501,12 @@ const createStore = (configObj = {}) => (() => {
     view(...args) {
       return view(...args);
     },
-    commitStore(...args) {
+    commit(...args) {
       commitStore(...args);
       return this;
     },
-    reloadStore(...args) {
-      reloadStore(...args);
+    fetch(...args) {
+      fetchStore(...args);
       return this;
     }
   };

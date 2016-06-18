@@ -8,7 +8,7 @@
 
 ### Persisting the Store on Disk
 
-To be able to sync the state to disk, define a `file` path when creating a store.
+To be able to sync the store to disk, define a `file` path when creating a store.
 
 Example
 
@@ -18,39 +18,47 @@ const store = cubbie.createStore({ file: 'path/to/file' });
 
 This will create the file if it doesn't exist but it will not write any contents to the file.
 
-**Saving the State to a File**
+**Saving the Store to a File**
 
-To write the contents of the file, run the `commitState` method.
+To write the contents of the file, run the `commitStore` method.
 
 Example
 
 ``` javascript
 const store = cubbie.createStore({ file: 'path/to/file' });
 store.setInitialState({/*...*/});
-store.commitState();
+store.commitStore();
 ```
 
 This will trigger the `STATE_COMMITTED` event.
 
-**Loading the State from a File**
+**Loading the Store from a File**
 
-To read in the contents of the file, run the `reloadState` method.
+To read in the contents of the file, run the `fetchStore` method.
 
 Example
 
 ``` javascript
 const store = cubbie.createStore({ file: 'path/to/file' });
 store.setInitialState({/*...*/});
-store.commitState();
+store.commitStore();
 /*...*/
-store.reloadState();
+store.fetchStore();
 ```
+
+This will merge the store from the file with current state history (even if its empty), remove duplicate states by id, and order the states by timestamp of when they were created. 
+
+Every state in Cubbie's stores is given a unique UUID and a timestamp when it is created, so you cab rest assured that the merge will go smoothly. 
+
+Run `store.rawStateHistory` to see how Cubbie stores states internally.
 
 This will trigger the `STATE_RELOADED` event.
 
+NOTE: State descriptions are not enforced with stores fetched from a file.
+
 ### Encryption
 
-To enable encryption pass an `encryption` object to the `createStore` method with the properties`secret` and `algorithm` (optional / default algorithm is `aes-256-ctr`).
+To enable encryption pass an `encryption` object to the `createStore` method with the properties`secret` and `algorithm` (default algorithm is `aes-256-ctr`).
 
 Example
 
@@ -63,9 +71,9 @@ const store = cubbie.createStore({
     }
 });
 store.setInitialState({/*...*/});
-store.commitState();
+store.commitStore();
 /*...*/
-store.reloadState();
+store.fetchStore();
 ```
 
-This will cause cubbie to decrypt on `reloadState` and to encrypt on `commitState` before reading to or writing from disk
+This will cause cubbie to decrypt on `fetchStore` and to encrypt on `commitStore` before reading to or writing from disk
