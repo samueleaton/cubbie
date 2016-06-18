@@ -61,7 +61,7 @@ store.describeState({
 
 `type` and `types` cannot be used in the same description object for the same property.
 
-**The following are valid types to use as a `type` or in `types`:**
+**The following are valid types to use as a `type` or in `types` (NOT case-sensitive):**
 - `'Array'`
 - `'Boolean'`
 - `'Date'`
