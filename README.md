@@ -14,7 +14,7 @@ Stupid simple state storage
 
 ## The Lowdown
 
-Cubbie allows the creation of state stores. It will keep track of the state history as the state is modified. It is built on an event system that allows anybody to listen for any state event. [Event namespacing](event_system.md#event-namespacing) is available to keep things manageable as lots of events are added.
+Cubbie allows the creation of state stores. It will keep track of the state history as the state is modified. It is built on an event system that allows anybody to listen for any state event. [Event namespacing](docs/event_system.md#event-namespacing) is available to keep things manageable as lots of events are added.
 
 If you are using Node.js (e.g. Electron) the entire state history can be synced to and from a file for persistent storage.
 
