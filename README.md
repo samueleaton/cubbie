@@ -4,7 +4,7 @@ Stupid simple state storage
 
 <br>  
 <p align="center">
-<img width="350" src="https://raw.githubusercontent.com/samueleaton/design/master/cubbie.png">    
+<img width="350" title="cubbie" alt="cubbie!" src="https://raw.githubusercontent.com/samueleaton/design/master/cubbie.png">    
 </p>
 <br>  
 

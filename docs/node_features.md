@@ -1,6 +1,6 @@
 # Additional Features for Node
 
-<img width="180" src="https://raw.githubusercontent.com/samueleaton/design/master/cubbie_plus_node.png">    
+<img width="180" alt="cubbie plus node.js" title="cubbie plus node.js" src="https://raw.githubusercontent.com/samueleaton/design/master/cubbie_plus_node.png">    
 
 > Cubbie + Node = code à la mode
 
