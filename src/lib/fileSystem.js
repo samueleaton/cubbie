@@ -72,7 +72,7 @@ function commitStore(eventEmitter, stateHist, configObj) {
     fs.writeFile(configObj.file, stringifiedStateHist + '\n', 'utf8', writeError => {
       if (writeError)
         return console.error(writeError);
-      eventEmitter.emit('STATE_COMMITTED');
+      eventEmitter.emit('STORE_COMMITTED');
     });
   }
   catch (writeError) {
