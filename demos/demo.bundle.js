@@ -533,14 +533,22 @@
 	    /*
 	    */
 	    function fetchStore() {
+	      var fetchConfig = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
 	      if (!_fileSystem2.default.isFsAvailable()) return console.error('file system is not available in this environment');
 	      if (typeof configObj.file !== 'string') return console.error('file path has not been set or is invalid');
 	      _fileSystem2.default.fetchStore(configObj, function (store) {
+	        if (!store) return console.error('Cubbie Error: Error fetching store');
+
 	        var invalidState = _lodash2.default.find(store, function (state) {
 	          return !state || !state.id || !state.timestamp;
 	        });
 
 	        if (invalidState) return console.error('Cubbie Error: Cannot import. Found invalid state: ', invalidState);
+
+	        if (!store.length && !states.length) return console.error('Cubbie Error: The current store and fetched stores are empty');
+
+	        if (_lodash2.default.isPlainObject(fetchConfig) && fetchConfig.hard === true) states = [];
 
 	        states = (0, _lodash2.default)(states).concat(store).uniqBy(function (state) {
 	          return state.id;

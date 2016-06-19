@@ -418,18 +418,27 @@ const createStore = (configObj = {}) => (() => {
 
   /*
   */
-  function fetchStore() {
+  function fetchStore(fetchConfig = {}) {
     if (!fileSystem.isFsAvailable())
       return console.error('file system is not available in this environment');
     if (typeof configObj.file !== 'string')
       return console.error('file path has not been set or is invalid');
     fileSystem.fetchStore(configObj, store => {
+      if (!store)
+        return console.error('Cubbie Error: Error fetching store');
+
       const invalidState = _.find(
         store, state => !state || !state.id || !state.timestamp
       );
 
       if (invalidState)
         return console.error('Cubbie Error: Cannot import. Found invalid state: ', invalidState);
+
+      if (!store.length && !states.length)
+        return console.error('Cubbie Error: The current store and fetched stores are empty');
+
+      if (_.isPlainObject(fetchConfig) && fetchConfig.hard === true)
+        states = [];
 
       states = _(states)
         .concat(store)
