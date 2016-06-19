@@ -85,8 +85,16 @@ class CubbieEventEmitter {
   }
   emit(evt, ...args) {
     if (this.eventLogging) {
+      // if state event
+      if (_.includes(this.stateEvents, evt)) {
+        console.log(
+          '%cCubbie Event: %c' + evt,
+          'color:#753FD3;font-weight:200;font-size:8px;',
+          'color:#DED0F6;font-weight:400;font-size:11px;background-color:#6326CC;padding:2px 3px;'
+        );
+      }
       // if listener(s)
-      if (_.isArray(this.events[evt]) || _.isArray(_.get(this.events.namespaces, evt))) {
+      else if (_.isArray(this.events[evt]) || _.isArray(_.get(this.events.namespaces, evt))) {
         console.log(
           '%cCubbie Event: %c' + evt,
           'color:#21AE83;font-weight:200;font-size:8px;',

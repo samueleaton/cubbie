@@ -63,7 +63,7 @@
 	window.store = store;
 
 	store.on(store.stateEvents, function () {
-	  console.log('* stateEvent fired');
+	  // console.log('* stateEvent fired');
 	});
 
 	store.describeState({
@@ -100,6 +100,16 @@
 	  console.log('5: hello ' + name + '. You are ' + age);
 	});
 
+	store.on('User.SelectBtn.click', function () {
+	  store.emit('User.select');
+	});
+
+	store.on('User.select', function () {
+	  store.modifyState(function (state) {
+	    state.currentPerson = 1;
+	  });
+	});
+
 	store.freeze();
 
 	store.createView('oldestPerson', function (state) {
@@ -111,6 +121,8 @@
 	store.createView('currentPerson', function (state) {
 	  return state.people[state.currentPerson];
 	});
+
+	store.emit('User.SelectBtn.click');
 
 /***/ },
 /* 1 */
@@ -17522,14 +17534,18 @@
 	      }
 
 	      if (this.eventLogging) {
-	        // if listener(s)
-	        if (_lodash2.default.isArray(this.events[evt]) || _lodash2.default.isArray(_lodash2.default.get(this.events.namespaces, evt))) {
-	          console.log('%cCubbie Event: %c' + evt, 'color:#21AE83;font-weight:200;font-size:8px;', 'color:#B8F1E0;font-weight:400;font-size:11px;background-color:#1C9470;padding:2px 3px;');
+	        // if state event
+	        if (_lodash2.default.includes(this.stateEvents, evt)) {
+	          console.log('%cCubbie Event: %c' + evt, 'color:#753FD3;font-weight:200;font-size:8px;', 'color:#DED0F6;font-weight:400;font-size:11px;background-color:#6326CC;padding:2px 3px;');
 	        }
-	        // if NO listener(s)
-	        else {
-	            console.log('%cCubbie Event: %c' + evt, 'color:#D57739;font-weight:200;font-size:8px;', 'color:#F7E3D5;font-weight:400;font-size:11px;background-color:#CC6B26;padding:2px 3px;');
+	        // if listener(s)
+	        else if (_lodash2.default.isArray(this.events[evt]) || _lodash2.default.isArray(_lodash2.default.get(this.events.namespaces, evt))) {
+	            console.log('%cCubbie Event: %c' + evt, 'color:#21AE83;font-weight:200;font-size:8px;', 'color:#B8F1E0;font-weight:400;font-size:11px;background-color:#1C9470;padding:2px 3px;');
 	          }
+	          // if NO listener(s)
+	          else {
+	              console.log('%cCubbie Event: %c' + evt, 'color:#D57739;font-weight:200;font-size:8px;', 'color:#F7E3D5;font-weight:400;font-size:11px;background-color:#CC6B26;padding:2px 3px;');
+	            }
 	      }
 	      if (!_lodash2.default.isArray(this.events[evt]) && !_lodash2.default.isArray(_lodash2.default.get(this.events.namespaces, evt))) return;
 	      if (this.events[evt]) {

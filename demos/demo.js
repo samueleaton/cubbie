@@ -8,7 +8,7 @@ store.eventLogging(true);
 window.store = store;
 
 store.on(store.stateEvents, () => {
-  console.log('* stateEvent fired');
+  // console.log('* stateEvent fired');
 });
 
 store.describeState({
@@ -49,6 +49,16 @@ store.on('HELLO', (name, age) => {
   console.log('5: hello ' + name + '. You are ' + age);
 });
 
+store.on('User.SelectBtn.click', () => {
+  store.emit('User.select');
+});
+
+store.on('User.select', () => {
+  store.modifyState(state => {
+    state.currentPerson = 1;
+  });
+});
+
 store.freeze();
 
 store.createView('oldestPerson', state => {
@@ -58,3 +68,5 @@ store.createView('oldestPerson', state => {
 store.createView('currentPerson', state => {
   return state.people[state.currentPerson];
 });
+
+store.emit('User.SelectBtn.click');
