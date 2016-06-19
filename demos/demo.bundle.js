@@ -58,10 +58,12 @@
 
 	var store = _index2.default.createStore();
 
+	store.eventLogging(true);
+
 	window.store = store;
 
-	store.on('STATE_SET', function () {
-	  console.log('State Set.');
+	store.on(store.stateEvents, function () {
+	  console.log('* stateEvent fired');
 	});
 
 	store.describeState({
@@ -74,7 +76,7 @@
 	});
 
 	store.initialState = {
-	  people: [{ name: "Sam", age: 25 }, { name: "Jasmine", age: 22 }, { name: "Nick", age: 21 }],
+	  people: [{ name: 'Sam', age: 25 }, { name: 'Jasmine', age: 22 }, { name: 'Nick', age: 21 }],
 	  animal: {
 	    info: [null]
 	  },
@@ -232,7 +234,7 @@
 	      var _historyLength = _history.length;
 
 	      var index = _lodash2.default.findLastIndex(_history, function (stateObj) {
-	        if (revertCb(stateObj.state)) return true;
+	        if (revertCb(stateObj)) return true;
 	      });
 
 	      if (index === -1) return false;
@@ -522,8 +524,6 @@
 	      if (!_fileSystem2.default.isFsAvailable()) return console.error('file system is not available in this environment');
 	      if (typeof configObj.file !== 'string') return console.error('file path has not been set or is invalid');
 	      _fileSystem2.default.fetchStore(configObj, function (store) {
-	        console.log('do statehistory merge here: ', store);
-
 	        var invalidState = _lodash2.default.find(store, function (state) {
 	          return !state || !state.id || !state.timestamp;
 	        });
@@ -537,8 +537,6 @@
 	        }).map(function (state) {
 	          return _CubbieState2.default.toCubbieState(state);
 	        }).value();
-
-	        console.log('states: ', states);
 
 	        eventEmitter.emit('STORE_FETCHED');
 	        return currentState();
@@ -587,6 +585,10 @@
 	        eventEmitter.on.apply(eventEmitter, arguments);
 	        return this;
 	      },
+	      setEventNamespace: function setEventNamespace() {
+	        eventEmitter.setEventNamespace.apply(eventEmitter, arguments);
+	        return this;
+	      },
 	      once: function once() {
 	        eventEmitter.once.apply(eventEmitter, arguments);
 	        return this;
@@ -609,6 +611,9 @@
 	      fetch: function fetch() {
 	        fetchStore.apply(undefined, arguments);
 	        return this;
+	      },
+	      eventLogging: function eventLogging(bool) {
+	        eventEmitter.eventLoggingActive(bool);
 	      }
 	    };
 
@@ -17441,46 +17446,73 @@
 	      STATE_MODIFIED: [],
 	      STATE_PROBED: [],
 	      STORE_COMMITTED: [],
-	      STORE_FETCHED: []
+	      STORE_FETCHED: [],
+	      namespaces: {}
 	    };
 	    this.stateEvents = ['STATE_SET', 'STATE_RESET', 'STATE_REVERTED', 'STATE_MODIFIED', 'STATE_PROBED', 'STORE_COMMITTED', 'STORE_FETCHED'];
 	    _lodash2.default.each(this.stateEvents, function (evt) {
 	      _this.events[evt] = [];
 	    });
+	    this.eventLogging = false;
 	  }
 
 	  _createClass(CubbieEventEmitter, [{
-	    key: 'on',
-	    value: function on(arg, evtCb) {
+	    key: 'buildEventNamespaceTree',
+	    value: function buildEventNamespaceTree(treeInProgress, namespaceObj) {
 	      var _this2 = this;
 
+	      _lodash2.default.forOwn(namespaceObj, function (val, key) {
+	        if (_lodash2.default.isPlainObject(val)) {
+	          treeInProgress[key] = {};
+	          _this2.buildEventNamespaceTree(treeInProgress[key], namespaceObj[key]);
+	        } else if (_lodash2.default.isFunction(val)) {
+	          if (!_lodash2.default.isArray(treeInProgress[key])) treeInProgress[key] = [];
+	          treeInProgress[key].push(val);
+	        } else throw new Error('Invalid value (' + val + ') for event namespace (' + key + ')');
+	      });
+	    }
+	  }, {
+	    key: 'on',
+	    value: function on(arg, evtCb) {
+	      var _this3 = this;
+
+	      if (arg === 'namespaces' || _lodash2.default.isArray(arg) && _lodash2.default.includes(arg, 'namespaces')) return console.error('Cubbie Error: cannot use reserved event name `namespaces`');
 	      var args = _lodash2.default.isArray(arg) ? arg : [arg];
 	      if (typeof evtCb !== 'function') return console.error('Cubbie Error: Last param to "on" must be of type "function".');
 	      _lodash2.default.each(args, function (evt) {
-	        if (!_lodash2.default.isArray(_this2.events[evt])) _this2.events[evt] = [];
-	        _this2.events[evt].push(evtCb);
+	        if (!_lodash2.default.isArray(_this3.events[evt])) _this3.events[evt] = [];
+	        _this3.events[evt].push(evtCb);
 	      });
 	    }
 	  }, {
 	    key: 'once',
 	    value: function once(arg, evtCb) {
-	      var _this3 = this;
+	      var _this4 = this;
 
+	      if (arg === 'namespaces' || _lodash2.default.isArray(arg) && _lodash2.default.includes(arg, 'namespaces')) return console.error('Cubbie Error: cannot use reserved event name `namespaces`');
 	      var args = _lodash2.default.isArray(arg) ? arg : [arg];
 	      if (typeof evtCb !== 'function') return console.error('Cubbie Error: Last param to "on" must be of type "function".');
 	      _lodash2.default.each(args, function (evt) {
-	        if (!_lodash2.default.isArray(_this3.events[evt])) _this3.events[evt] = [];
+	        if (!_lodash2.default.isArray(_this4.events[evt])) _this4.events[evt] = [];
 
 	        var onceCb = function onceCb() {
 	          evtCb.apply(undefined, arguments);
-	          var index = _this3.events[evt].indexOf(onceCb);
+	          var index = _this4.events[evt].indexOf(onceCb);
 
 	          // after running, make callback null
-	          _this3.events[evt][index] = null;
+	          _this4.events[evt][index] = null;
 	        };
 
-	        _this3.events[evt].push(onceCb);
+	        _this4.events[evt].push(onceCb);
 	      });
+	    }
+	  }, {
+	    key: 'setEventNamespace',
+	    value: function setEventNamespace(namespace, namespaceObj) {
+	      if (this.events.namespaces[namespace]) throw new Error('Cubbie: event namespace (' + namespace + ') already exists');
+	      if (!_lodash2.default.isPlainObject(namespaceObj)) throw new Error('Cubbie: second paramter to setEventNamespace must be an object');
+	      this.events.namespaces[namespace] = {};
+	      this.buildEventNamespaceTree(this.events.namespaces[namespace], namespaceObj);
 	    }
 	  }, {
 	    key: 'emit',
@@ -17489,10 +17521,33 @@
 	        args[_key - 1] = arguments[_key];
 	      }
 
-	      if (!this.events[evt]) return;
-	      _lodash2.default.each(this.events[evt], function (evtCb) {
-	        if (evtCb) return evtCb.apply(undefined, args);
-	      });
+	      if (this.eventLogging) {
+	        // if listener(s)
+	        if (_lodash2.default.isArray(this.events[evt]) || _lodash2.default.isArray(_lodash2.default.get(this.events.namespaces, evt))) {
+	          console.log('%cCubbie Event: %c' + evt, 'color:#21AE83;font-weight:200;font-size:8px;', 'color:#B8F1E0;font-weight:400;font-size:11px;background-color:#1C9470;padding:2px 3px;');
+	        }
+	        // if NO listener(s)
+	        else {
+	            console.log('%cCubbie Event: %c' + evt, 'color:#D57739;font-weight:200;font-size:8px;', 'color:#F7E3D5;font-weight:400;font-size:11px;background-color:#CC6B26;padding:2px 3px;');
+	          }
+	      }
+	      if (!_lodash2.default.isArray(this.events[evt]) && !_lodash2.default.isArray(_lodash2.default.get(this.events.namespaces, evt))) return;
+	      if (this.events[evt]) {
+	        _lodash2.default.each(this.events[evt], function (evtCb) {
+	          if (evtCb) return evtCb.apply(undefined, args);
+	        });
+	      }
+	      if (_lodash2.default.get(this.events.namespaces, evt)) {
+	        _lodash2.default.each(_lodash2.default.get(this.events.namespaces, evt), function (evtCb) {
+	          if (evtCb) return evtCb.apply(undefined, args);
+	        });
+	      }
+	    }
+	  }, {
+	    key: 'eventLoggingActive',
+	    value: function eventLoggingActive(bool) {
+	      if (!_lodash2.default.isBoolean(bool)) return console.error('Cubbie Error: eventLogging takes a boolean');
+	      this.eventLogging = bool;
 	    }
 	  }]);
 
@@ -17534,7 +17589,8 @@
 	function stringifyStateHistory(state, configObj) {
 	  var stateStr = void 0;
 	  try {
-	    stateStr = JSON.stringify(state, null, '  ');
+	    var pretty = configObj.pretty === true;
+	    stateStr = JSON.stringify(state, null, pretty && 2);
 	  } catch (stringifyErr) {
 	    return console.error(stringifyErr);
 	  }

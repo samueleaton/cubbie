@@ -11,19 +11,18 @@
 
   const store = cubbie.createStore({
     file: './store.cubbie'
-    // ,
-    // encryption: {
+    // ,encryption: {
     //   secret: 'mr_poopy_butthole'
     // }
   });
 
   window.store = store;
 
-  store.on(store.stateEvents, (x, y) => {
+  store.eventLogging(true);
+
+  store.on(store.stateEvents, () => {
     console.log('\nstate event emitted');
-    console.log('x: ', x);
-    console.log('y: ', y);
-  })
+  });
 
   store.on('STATE_SET', () => {
     console.log('State Set.');
@@ -38,24 +37,24 @@
     currentPerson: cubbie.describe({ type: 'NUMBER' })
   });
 
-  // store.initialState = {
-  //   people: [
-  //     {name: "Sam", age: 25},
-  //     {name: "Jasmine", age: 22},
-  //     {name: "Nick", age: 21}
-  //   ],
-  //   animal: {
-  //     info: [null]
-  //   },
-  //   currentPerson: 0,
-  //   currentPanel: 'HOME'
-  // };
+  store.initialState = {
+    people: [
+      { name: 'Sam', age: 25 },
+      { name: 'Jasmine', age: 22 },
+      { name: 'Nick', age: 21 }
+    ],
+    animal: {
+      info: [ null ]
+    },
+    currentPerson: 0,
+    currentPanel: 'HOME'
+  };
 
-  // store.freeze();
+  store.freeze();
 
-  store.createView('oldestPerson', (state) => {
+  store.createView('oldestPerson', state => {
     return _.maxBy(state.people, person => person.age);
-  })
+  });
 </script>
 </body>
 </html>

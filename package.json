@@ -9,7 +9,7 @@
     "bundle": "webpack",
     "screwy": "screwy",
     "electron-demo": "electron demos/electron-demo.js",
-    "lint": "eslint --max-warnings 10 -c .eslintrc.json src/"
+    "lint": "eslint --max-warnings 8 -c .eslintrc.json src/"
   },
   "repository": {
     "type": "git",

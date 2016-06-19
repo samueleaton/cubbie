@@ -3,10 +3,12 @@ import _ from 'lodash';
 
 const store = cubbie.createStore();
 
+store.eventLogging(true);
+
 window.store = store;
 
-store.on('STATE_SET', () => {
-  console.log('State Set.');
+store.on(store.stateEvents, () => {
+  console.log('* stateEvent fired');
 });
 
 store.describeState({
@@ -20,12 +22,12 @@ store.describeState({
 
 store.initialState = {
   people: [
-    {name: "Sam", age: 25},
-    {name: "Jasmine", age: 22},
-    {name: "Nick", age: 21}
+    { name: 'Sam', age: 25 },
+    { name: 'Jasmine', age: 22 },
+    { name: 'Nick', age: 21 }
   ],
   animal: {
-    info: [null]
+    info: [ null ]
   },
   currentPerson: 0,
   currentPanel: 'HOME'
@@ -51,8 +53,8 @@ store.freeze();
 
 store.createView('oldestPerson', state => {
   return _.maxBy(state.people, person => person.age);
-})
+});
 
 store.createView('currentPerson', state => {
   return state.people[state.currentPerson];
-})
+});
