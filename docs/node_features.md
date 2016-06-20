@@ -1,6 +1,6 @@
 # Additional Features for Node
 
-<img width="180" alt="cubbie plus node.js" title="cubbie plus node.js" src="https://raw.githubusercontent.com/samueleaton/design/master/cubbie_plus_node.png">    
+<img width="180" alt="cubbie plus node.js" title="cubbie plus node.js" src="https://raw.githubusercontent.com/samueleaton/design/master/cubbie_plus_node.png">
 
 > Cubbie + Node = code à la mode
 
@@ -38,7 +38,7 @@ The following can be passed to `commit`:
 
 - **hard**: (Boolean) If true, will overwrite the current contents on disk instead of smart diffing
 - **pretty**: (Boolean) If true, will write JSON contents in readable format
-- **clean**: (Boolean) If true, will run the `clean` method on the store before writing it to disk (See [Cleaning the Store](docs/cleaning_the_store.md))
+- **clean**: (Boolean) If true, will run the `clean` method on the store before writing it to disk (See [Cleaning the Store](cleaning_the_store.md))
 
 Example
 
@@ -60,9 +60,9 @@ store.commitStore();
 store.fetchStore();
 ```
 
-This will merge the store from the file with current state history (even if its empty), remove duplicate states by id, and order the states by timestamp of when they were created. 
+This will merge the store from the file with current state history (even if its empty), remove duplicate states by id, and order the states by timestamp of when they were created.
 
-Every state in Cubbie's stores is given a unique UUID and a timestamp when it is created, so you cab rest assured that the merge will go smoothly. 
+Every state in Cubbie's stores is given a unique UUID and a timestamp when it is created, so you cab rest assured that the merge will go smoothly.
 
 Run `store.rawStateHistory` to see how Cubbie stores states internally.
 
