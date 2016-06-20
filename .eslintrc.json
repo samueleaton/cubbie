@@ -199,7 +199,7 @@
     "no-this-before-super": 2,                           
     "no-useless-constructor": 1,                           
     "no-var": 2,                           
-    "object-shorthand": [1, "always"],                           
+    "object-shorthand": [1, "methods"],                           
     "prefer-arrow-callback": [1, { "allowNamedFunctions": true }],                          
     "prefer-const": 1,                           
     "prefer-reflect": 0,                           

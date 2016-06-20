@@ -3,6 +3,7 @@ import CubbieDescription from './CubbieDescription';
 import EventEmitter from './eventEmitter';
 import fileSystem from './fileSystem';
 import CubbieState from './CubbieState';
+import cleanStore from './cleanStore';
 
 /*
 */
@@ -35,8 +36,8 @@ const createStore = (configObj = {}) => (() => {
 
   /*
   */
-  function createStateObject(state) {
-    return new CubbieState({ state });
+  function createStateObject(state, isInitialState) {
+    return new CubbieState({ state, isInitialState });
   }
 
   /*
@@ -146,7 +147,8 @@ const createStore = (configObj = {}) => (() => {
         );
       }
     }
-    states[0] = createStateObject(initialState);
+
+    states[0] = createStateObject(initialState, true);
     initialStateSet = true;
     eventEmitter.emit('STATE_SET');
   }
@@ -154,7 +156,8 @@ const createStore = (configObj = {}) => (() => {
   /*
   */
   function setNewState(newState) {
-    states.push(createStateObject(newState));
+    const isInitialState = Boolean(!states.length);
+    states.push(createStateObject(newState, isInitialState));
   }
 
   /*
@@ -408,12 +411,19 @@ const createStore = (configObj = {}) => (() => {
 
   /*
   */
-  function commitStore() {
+  function commitStore(commitConfig = {}) {
     if (!fileSystem.isFsAvailable())
       return console.error('file system is not available in this environment');
+    
     if (typeof configObj.file !== 'string')
       return console.error('file path has not been set or is invalid');
-    fileSystem.commitStore(eventEmitter, states, configObj);
+
+    fileSystem.commitStore({
+      eventEmitter: eventEmitter,
+      stateHistory: states,
+      configObj: configObj,
+      commitConfig: commitConfig
+    });
   }
 
   /*
@@ -451,7 +461,6 @@ const createStore = (configObj = {}) => (() => {
       return currentState();
     });
   }
-
 
   /* Store
   */
@@ -524,6 +533,10 @@ const createStore = (configObj = {}) => (() => {
     },
     eventLogging(bool) {
       eventEmitter.eventLoggingActive(bool);
+    },
+    clean() {
+      cleanStore(states);
+      return this;
     }
   };
 

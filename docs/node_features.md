@@ -6,7 +6,7 @@
 
 <br />
 
-### Persisting the Store on Disk
+## Persisting the Store on Disk
 
 To be able to sync the store to disk, define a `file` path when creating a store.
 
@@ -18,7 +18,7 @@ const store = cubbie.createStore({ file: 'path/to/file' });
 
 This will create the file if it doesn't exist but it will not write any contents to the file.
 
-**Saving the Store to a File**
+### Saving the Store to a File
 
 To write the contents of the file, run the `commitStore` method.
 
@@ -32,7 +32,21 @@ store.commitStore();
 
 This will trigger the `STORE_COMMITTED` event.
 
-**Loading the Store from a File**
+#### Commit Options
+
+The following can be passed to `commit`:
+
+- **hard**: (Boolean) If true, will overwrite the current contents on disk instead of smart diffing
+- **pretty**: (Boolean) If true, will write JSON contents in readable format
+- **clean**: (Boolean) If true, will run the `clean` method on the store before writing it to disk (See [Cleaning the Store](docs/cleaning_the_store.md))
+
+Example
+
+``` javascript
+store.commit({ pretty: true, clean: true });
+```
+
+### Loading the Store from a File
 
 To read in the contents of the file, run the `fetchStore` method.
 
@@ -55,6 +69,18 @@ Run `store.rawStateHistory` to see how Cubbie stores states internally.
 This will trigger the `STORE_FETCHED` event.
 
 NOTE: State descriptions are not enforced with stores fetched from a file.
+
+#### Fetch Options
+
+The following can be passed to `fetch`:
+
+- **hard**: (Boolean) If true, will overwrite the current store with the fetched store instead of smart diffing/merging
+
+Example
+
+``` javascript
+store.fetch({ hard: true });
+```
 
 ### Encryption
 

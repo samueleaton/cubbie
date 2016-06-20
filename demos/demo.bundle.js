@@ -174,6 +174,10 @@
 
 	var _CubbieState2 = _interopRequireDefault(_CubbieState);
 
+	var _cleanStore = __webpack_require__(13);
+
+	var _cleanStore2 = _interopRequireDefault(_cleanStore);
+
 	function _interopRequireDefault(obj) {
 	  return obj && obj.__esModule ? obj : { default: obj };
 	}
@@ -210,8 +214,8 @@
 
 	    /*
 	    */
-	    function createStateObject(state) {
-	      return new _CubbieState2.default({ state: state });
+	    function createStateObject(state, isInitialState) {
+	      return new _CubbieState2.default({ state: state, isInitialState: isInitialState });
 	    }
 
 	    /*
@@ -306,7 +310,8 @@
 	          return console.warn('Cubbie Warning: Could not set initialState. State does not match state description.');
 	        }
 	      }
-	      states[0] = createStateObject(initialState);
+
+	      states[0] = createStateObject(initialState, true);
 	      initialStateSet = true;
 	      eventEmitter.emit('STATE_SET');
 	    }
@@ -314,7 +319,8 @@
 	    /*
 	    */
 	    function setNewState(newState) {
-	      states.push(createStateObject(newState));
+	      var isInitialState = Boolean(!states.length);
+	      states.push(createStateObject(newState, isInitialState));
 	    }
 
 	    /*
@@ -525,9 +531,18 @@
 	    /*
 	    */
 	    function commitStore() {
+	      var commitConfig = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
 	      if (!_fileSystem2.default.isFsAvailable()) return console.error('file system is not available in this environment');
+
 	      if (typeof configObj.file !== 'string') return console.error('file path has not been set or is invalid');
-	      _fileSystem2.default.commitStore(eventEmitter, states, configObj);
+
+	      _fileSystem2.default.commitStore({
+	        eventEmitter: eventEmitter,
+	        stateHistory: states,
+	        configObj: configObj,
+	        commitConfig: commitConfig
+	      });
 	    }
 
 	    /*
@@ -634,6 +649,10 @@
 	      },
 	      eventLogging: function eventLogging(bool) {
 	        eventEmitter.eventLoggingActive(bool);
+	      },
+	      clean: function clean() {
+	        (0, _cleanStore2.default)(states);
+	        return this;
 	      }
 	    };
 
@@ -17602,28 +17621,82 @@
 
 	var _crypter2 = _interopRequireDefault(_crypter);
 
+	var _lodash = __webpack_require__(4);
+
+	var _lodash2 = _interopRequireDefault(_lodash);
+
+	var _CubbieState = __webpack_require__(11);
+
+	var _CubbieState2 = _interopRequireDefault(_CubbieState);
+
+	var _cleanStore = __webpack_require__(13);
+
+	var _cleanStore2 = _interopRequireDefault(_cleanStore);
+
 	function _interopRequireDefault(obj) {
 	  return obj && obj.__esModule ? obj : { default: obj };
 	}
 
+	/*
+	*/
 	function isFsAvailable() {
 	  return (typeof _fs2.default === 'undefined' ? 'undefined' : _typeof(_fs2.default)) === 'object' && typeof _fs2.default.readFile === 'function' && typeof _fs2.default.writeFile === 'function' && _fs2.default.readFile.length === 3 && _fs2.default.writeFile.length === 4;
 	}
 
-	function stringifyStateHistory(state, configObj) {
-	  var stateStr = void 0;
+	/*
+	*/
+	function writeStore(_ref) {
+	  var storeArray = _ref.storeArray;
+	  var eventEmitter = _ref.eventEmitter;
+	  var configObj = _ref.configObj;
+	  var commitConfig = _ref.commitConfig;
+
+	  if (!storeArray || !eventEmitter || !configObj || !commitConfig) return console.error('Missing param');
+
 	  try {
-	    var pretty = configObj.pretty === true;
-	    stateStr = JSON.stringify(state, null, pretty && 2);
+	    var stringifiedStateHist = stringifyStateHistory(storeArray, configObj, commitConfig);
+	    _fs2.default.writeFile(configObj.file, stringifiedStateHist + '\n', 'utf8', function (writeError) {
+	      if (writeError) return console.error(writeError);
+	      eventEmitter.emit('STORE_COMMITTED');
+	    });
+	  } catch (writeError) {
+	    console.error(writeError);
+	  }
+	}
+
+	/*
+	*/
+	function fetchStoreContents(configObj, fetchCb) {
+	  try {
+	    _fs2.default.readFile(configObj.file, 'utf8', function (readErr, fileData) {
+	      fetchCb(readErr, parseStateHistory(fileData.trim(), configObj));
+	    });
+	  } catch (readErr) {
+	    console.error(readErr);
+	  }
+	}
+
+	/*
+	*/
+	function stringifyStateHistory(stateHistory, configObj) {
+	  var commitConfig = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+	  var storeStr = void 0;
+	  try {
+	    var pretty = commitConfig.pretty === true;
+	    var store = commitConfig.clean === true ? (0, _cleanStore2.default)(stateHistory) : stateHistory;
+	    storeStr = JSON.stringify(store, null, pretty && 2);
 	  } catch (stringifyErr) {
 	    return console.error(stringifyErr);
 	  }
 
 	  if (_crypter2.default.isEncryptionEnabled(configObj)) {
-	    return _crypter2.default.encrypt(stateStr, configObj.encryption.secret, configObj.encryption.algorithm);
-	  } else return stateStr;
+	    return _crypter2.default.encrypt(storeStr, configObj.encryption.secret, configObj.encryption.algorithm);
+	  } else return storeStr;
 	}
 
+	/*
+	*/
 	function parseStateHistory(stateHist, configObj) {
 	  var stateHistStr = void 0;
 	  if (_crypter2.default.isEncryptionEnabled(configObj)) {
@@ -17634,11 +17707,14 @@
 	  try {
 	    stateHistObj = JSON.parse(stateHistStr);
 	  } catch (parseError) {
-	    return console.error(parseError);
+	    console.error(parseError);
+	    return null;
 	  }
-	  return stateHistObj || [];
+	  return stateHistObj || null;
 	}
 
+	/*
+	*/
 	function initStorage(configObj) {
 	  /* eslint-disable no-sync */
 	  try {
@@ -17653,27 +17729,168 @@
 	  /* eslint-enable no-sync */
 	}
 
-	function commitStore(eventEmitter, stateHist, configObj) {
-	  try {
-	    var stringifiedStateHist = stringifyStateHistory(stateHist, configObj);
-	    _fs2.default.writeFile(configObj.file, stringifiedStateHist + '\n', 'utf8', function (writeError) {
-	      if (writeError) return console.error(writeError);
-	      eventEmitter.emit('STORE_COMMITTED');
+	/*
+	*/
+	function mergeAndWriteStores(_ref2) {
+	  var fileStore = _ref2.fileStore;
+	  var stateHistory = _ref2.stateHistory;
+	  var eventEmitter = _ref2.eventEmitter;
+	  var configObj = _ref2.configObj;
+	  var commitConfig = _ref2.commitConfig;
+
+	  if (!stateHistory || !fileStore || !eventEmitter || !configObj || !commitConfig) return console.error('Missing param');
+
+	  var mergedStore = (0, _lodash2.default)(fileStore).concat(stateHistory).uniqBy(function (state) {
+	    return state.id;
+	  }).sortBy(function (state) {
+	    return state.timestamp;
+	  }).map(function (state) {
+	    return _CubbieState2.default.toCubbieState(state);
+	  }).value();
+
+	  writeStore({
+	    storeArray: mergedStore,
+	    eventEmitter: eventEmitter,
+	    configObj: configObj,
+	    commitConfig: commitConfig
+	  });
+	}
+
+	/*
+	  if initialState conflict on commit
+	*/
+	function commitDiffConflict(_ref3) {
+	  var stateHistory = _ref3.stateHistory;
+	  var fileStore = _ref3.fileStore;
+	  var eventEmitter = _ref3.eventEmitter;
+	  var configObj = _ref3.configObj;
+	  var commitConfig = _ref3.commitConfig;
+
+	  var file = configObj.file;
+	  var fileStoreInitialState = fileStore.find(function (state) {
+	    return state.isInitialState;
+	  });
+	  var stateHistoryInitialState = stateHistory.find(function (state) {
+	    return state.isInitialState;
+	  });
+
+	  console.warn('Cubbie Warning: ' + file + ' and currrent initial state id\'s conflict');
+
+	  if (stateHistoryInitialState.timestamp > fileStoreInitialState.timestamp) {
+	    console.warn('Cubbie Warning: Overwriting ' + file + ' with current stateHistory');
+	    return writeStore({
+	      storeArray: stateHistory,
+	      eventEmitter: eventEmitter,
+	      configObj: configObj,
+	      commitConfig: commitConfig
 	    });
-	  } catch (writeError) {
-	    console.error(writeError);
+	  } else {
+	    return console.warn('Cubbie Warning: Inital state in ' + file + ' is newer than' + 'current inital state. Aborting commit...');
+	  }
+	  return writeStore({
+	    storeArray: stateHistory,
+	    eventEmitter: eventEmitter,
+	    configObj: configObj,
+	    commitConfig: commitConfig
+	  });
+	}
+
+	/*
+	  if both stores have data, decide how to commit
+	*/
+	function commitDiff(_ref4) {
+	  var stateHistory = _ref4.stateHistory;
+	  var fileStore = _ref4.fileStore;
+	  var eventEmitter = _ref4.eventEmitter;
+	  var configObj = _ref4.configObj;
+	  var commitConfig = _ref4.commitConfig;
+
+	  if (!stateHistory || !fileStore || !eventEmitter || !configObj || !commitConfig) return console.error('Missing param');
+
+	  var file = configObj.file;
+	  var fileStoreInitialState = fileStore.find(function (state) {
+	    return state.isInitialState;
+	  });
+	  var stateHistoryInitialState = stateHistory.find(function (state) {
+	    return state.isInitialState;
+	  });
+
+	  // file doesn't have an inital state, overwrite it
+	  if (!fileStoreInitialState) {
+	    console.warn('Cubbie Warning: ' + file + ' doesn\'t have an initial state. Overwriting it.');
+	    return writeStore({
+	      storeArray: stateHistory,
+	      eventEmitter: eventEmitter,
+	      configObj: configObj,
+	      commitConfig: commitConfig
+	    });
+	  }
+
+	  // both stores have same inital state, merge 'em
+	  else if (fileStoreInitialState.id === stateHistoryInitialState.id) mergeAndWriteStores({ fileStore: fileStore, stateHistory: stateHistory, eventEmitter: eventEmitter, configObj: configObj, commitConfig: commitConfig });
+
+	    // conflicting inital states
+	    else commitDiffConflict({ stateHistory: stateHistory, fileStore: fileStore, eventEmitter: eventEmitter, configObj: configObj, commitConfig: commitConfig });
+	}
+
+	/*
+	*/
+	function commitStore(_ref5) {
+	  var stateHistory = _ref5.stateHistory;
+	  var eventEmitter = _ref5.eventEmitter;
+	  var configObj = _ref5.configObj;
+	  var commitConfig = _ref5.commitConfig;
+
+	  if (!stateHistory || !eventEmitter || !configObj || !commitConfig) return console.error('Missing param');
+
+	  var stateHistoryInitialState = stateHistory.find(function (state) {
+	    return state.isInitialState;
+	  });
+
+	  if (!stateHistory.length) {
+	    console.warn('Cubbie Warning: current stateHistory empty Aborting commit...');
+	    return;
+	  }
+
+	  // no inital state in current state history. Cannot overwrite store
+	  if (!stateHistoryInitialState) {
+	    console.warn('Cubbie Warning: current stateHistory has no initalState. Aborting commit...');
+	    return;
+	  }
+
+	  // if hard commit enabled, just overwrite the f**ker
+	  if (_lodash2.default.isPlainObject(commitConfig) && commitConfig.hard === true) {
+	    return writeStore({
+	      storeArray: stateHistory,
+	      eventEmitter: eventEmitter,
+	      configObj: configObj,
+	      commitConfig: commitConfig
+	    });
+	  } else {
+	    fetchStoreContents(configObj, function (fetchErr, fileStore) {
+	      // if read error or files store is empty
+	      if (fetchErr || !_lodash2.default.isArray(fileStore) || !fileStore.length) {
+	        return writeStore({
+	          storeArray: stateHistory,
+	          eventEmitter: eventEmitter,
+	          configObj: configObj,
+	          commitConfig: commitConfig
+	        });
+	      }
+
+	      // both stores have data
+	      else commitDiff({ stateHistory: stateHistory, fileStore: fileStore, eventEmitter: eventEmitter, configObj: configObj, commitConfig: commitConfig });
+	    });
 	  }
 	}
 
-	function fetchStore(configObj, reloadCb) {
-	  try {
-	    _fs2.default.readFile(configObj.file, 'utf8', function (readErr, fileData) {
-	      if (readErr) return console.error(readErr);
-	      reloadCb(parseStateHistory(fileData.trim(), configObj));
-	    });
-	  } catch (readErr) {
-	    console.error(readErr);
-	  }
+	/*
+	*/
+	function fetchStore(configObj, fetchCb) {
+	  fetchStoreContents(configObj, function (fetchErr, storeObj) {
+	    if (fetchErr) return console.error(fetchErr);
+	    fetchCb(storeObj);
+	  });
 	}
 
 	module.exports = {
@@ -17786,6 +18003,7 @@
 	    var state = _ref.state;
 	    var id = _ref.id;
 	    var timestamp = _ref.timestamp;
+	    var isInitialState = _ref.isInitialState;
 
 	    _classCallCheck(this, CubbieState);
 
@@ -17793,6 +18011,7 @@
 	    this.id = id || (0, _generateUUID2.default)();
 	    this.timestamp = timestamp || Date.now();
 	    this.state = state;
+	    this.isInitialState = isInitialState || false;
 	  }
 
 	  return CubbieState;
@@ -17819,6 +18038,58 @@
 	    return (char === 'x' ? randChar : randChar & 0x3 | 0x8).toString(16);
 	  });
 	  return uuid;
+	}
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = clean;
+
+	var _lodash = __webpack_require__(4);
+
+	var _lodash2 = _interopRequireDefault(_lodash);
+
+	function _interopRequireDefault(obj) {
+	  return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	function clean(store) {
+	  if (!_lodash2.default.isArray(store)) return console.error('Cubbie Error: Cannot run cleaner on non-array');
+	  var currentBaseIndex = 0;
+	  var currentMatchIndex = 0;
+
+	  function runCleaner(storeArr) {
+	    if (currentBaseIndex >= storeArr.length) return;
+
+	    // top level loop from left
+	    _lodash2.default.find(storeArr, function (baseStateObj, baseIndex) {
+	      currentBaseIndex = baseIndex;
+
+	      // inner loop from right
+	      var i = _lodash2.default.findLastIndex(storeArr, function (matchStateObj, matchIndex) {
+	        currentMatchIndex = matchIndex;
+	        if (currentMatchIndex === currentBaseIndex) return true;
+	        if (_lodash2.default.isEqual(baseStateObj.state, matchStateObj.state)) return true;
+	      });
+
+	      if (i !== -1 && currentBaseIndex !== currentMatchIndex) {
+	        storeArr.splice(currentBaseIndex, currentMatchIndex - currentBaseIndex);
+	        currentBaseIndex++;
+	        return true;
+	      }
+	    }, currentBaseIndex);
+
+	    // if havn't looped
+	    if (currentBaseIndex < storeArr.length - 1) return runCleaner(storeArr);
+	    return storeArr;
+	  }
+	  return runCleaner(store);
 	}
 
 /***/ }

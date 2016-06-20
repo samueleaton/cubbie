@@ -167,6 +167,18 @@ It will remove all states from the state history **except for the initial state 
 store.purgeStateHistory();
 ```
 
+(Note: `clean` is more advanced than purging. Purge is being considered for deprecation or re-haul)
+
+### Cleaning the State History
+
+Cleaning the store is much more advanced than purging. It will find states that are identical and remove everything in between.
+
+``` javascript
+store.clean();
+```
+
+See [Cleaning the Store](docs/cleaning_the_store.md)
+
 ### Static State
 
 Internally, static state is a totally separate object from the normal state. It is meant to be set from the beginning of the app and it cannot be changed, unless you totally reset it.
