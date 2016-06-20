@@ -62,7 +62,7 @@ store.fetchStore();
 
 This will merge the store from the file with current state history (even if its empty), remove duplicate states by id, and order the states by timestamp of when they were created.
 
-Every state in Cubbie's stores is given a unique UUID and a timestamp when it is created, so you cab rest assured that the merge will go smoothly.
+Every state in Cubbie's stores is given a unique UUID and a timestamp when it is created, so you can rest assured that the merge will go smoothly.
 
 Run `store.rawStateHistory` to see how Cubbie stores states internally.
 
