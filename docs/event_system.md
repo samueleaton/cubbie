@@ -63,7 +63,7 @@ To get an array of all state events, access the `stateEvents` property.
 
 ### Event Namespacing
 
-Having so many events can get messy, so use namspaces to make things organized. Create a namespace object and then pass it to the `createEventNamspace` method.
+Having so many events can get messy, so use namspaces to make things organized. Create a namespace object and then pass it to the `setEventNamspace` method.
 
 ``` javascript
 const UserPreferenceEvents = {
