@@ -1,8 +1,14 @@
-import fs from 'fs';
 import crypter from './crypter';
 import _ from 'lodash';
 import CubbieState from './CubbieState';
 import cleanStore from './cleanStore';
+
+let fs = {};
+
+if (typeof process !== 'undefined' && process.env)
+  fs = require('fs'); // eslint-disable-line
+else
+  fs = require('./empty'); // eslint-disable-line
 
 /*
 */

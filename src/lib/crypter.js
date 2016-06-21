@@ -1,4 +1,9 @@
-import crypto from 'crypto';
+let crypto = {};
+
+if (typeof process !== 'undefined' && process.env)
+  crypto = require('crypto'); // eslint-disable-line
+else
+  crypto = require('./empty'); // eslint-disable-line
 
 const crypter = {
   encrypt(str, secret, algorithm = 'aes-256-ctr') {

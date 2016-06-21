@@ -4,9 +4,9 @@
   "description": "Stupid simple state storage",
   "main": "index.js",
   "scripts": {
-    "transpile": "babel src -d .",
-    "pretranspile": "npm run -s lint",
+    "prebundle": "npm run -s lint",
     "bundle": "webpack",
+    "bundle-demo": "webpack --config webpack.demo.config.js",
     "screwy": "screwy",
     "electron-demo": "electron demos/electron-demo.js",
     "lint": "eslint --max-warnings 8 -c .eslintrc.json src/"
@@ -36,5 +36,9 @@
   },
   "dependencies": {
     "lodash": "^4.6.1"
+  },
+  "browser": {
+    "fs": "./src/lib/empty",
+    "crypto": "./src/lib/empty"
   }
 }

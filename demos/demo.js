@@ -1,4 +1,4 @@
-import cubbie from '../index.js';
+import cubbie from '../dist/cubbie.bundle.js';
 import _ from 'lodash';
 
 const store = cubbie.createStore();
