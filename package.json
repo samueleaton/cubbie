@@ -2,7 +2,7 @@
   "name": "cubbie",
   "version": "1.1.6",
   "description": "Stupid simple state storage",
-  "main": "index.js",
+  "main": "dist/cubbie.bundle.js",
   "scripts": {
     "prebundle": "npm run -s lint",
     "bundle": "webpack",
@@ -38,7 +38,7 @@
     "lodash": "^4.6.1"
   },
   "browser": {
-    "fs": "./src/lib/empty",
-    "crypto": "./src/lib/empty"
+    "fs": "./lib/empty",
+    "crypto": "./lib/empty"
   }
 }
