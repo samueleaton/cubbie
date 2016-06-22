@@ -45,6 +45,14 @@ store.emit('EVENT_NAME' [, optional_args]);
 
 Arguments passed to the emitter will be passed as parameters to the event handler.
 
+### Removing Events
+
+``` javascript
+store.off('EVENT_NAME' [, callback]);
+```
+
+This remove the event listener for the event. If the callback is omitted, all listeners for the event will be removed.
+
 ### Built-in Events (`stateEvents`)
 
 Custom events can be added and emitted, but there are 5 built-in *State Events*.
