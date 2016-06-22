@@ -1,6 +1,6 @@
 {
   "name": "cubbie",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "Stupid simple state storage",
   "main": "dist/cubbie.bundle.js",
   "scripts": {
