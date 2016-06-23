@@ -33,40 +33,40 @@ store.initialState = {
   currentPanel: 'HOME'
 };
 
-store.on('HELLO', (name, age) => {
-  console.log('1: hello ' + name + '. You are ' + age);
-});
-store.on('HELLO', (name, age) => {
-  console.log('2: hello ' + name + '. You are ' + age);
-});
-store.once('HELLO', (name, age) => {
-  console.log('3: HELLO ' + name + '!!! YOU ARE ' + age + '!!!');
-});
-store.once('HELLO', (name, age) => {
-  console.log('4: HELLO ' + name + '!!! YOU ARE ' + age + '!!!');
-});
-store.on('HELLO', (name, age) => {
-  console.log('5: hello ' + name + '. You are ' + age);
-});
+// store.on('HELLO', (name, age) => {
+//   console.log('1: hello ' + name + '. You are ' + age);
+// });
+// store.on('HELLO', (name, age) => {
+//   console.log('2: hello ' + name + '. You are ' + age);
+// });
+// store.once('HELLO', (name, age) => {
+//   console.log('3: HELLO ' + name + '!!! YOU ARE ' + age + '!!!');
+// });
+// store.once('HELLO', (name, age) => {
+//   console.log('4: HELLO ' + name + '!!! YOU ARE ' + age + '!!!');
+// });
+// store.on('HELLO', (name, age) => {
+//   console.log('5: hello ' + name + '. You are ' + age);
+// });
 
-store.on('User.SelectBtn.click', () => {
-  store.emit('User.select');
-});
+// store.on('User.SelectBtn.click', () => {
+//   store.emit('User.select');
+// });
 
-store.on('User.select', () => {
-  store.modifyState(state => {
-    state.currentPerson = 1;
-  });
-});
+// store.on('User.select', () => {
+//   store.modifyState(state => {
+//     state.currentPerson = 1;
+//   });
+// });
 
-store.freeze();
+// store.freeze();
 
-store.createView('oldestPerson', state => {
-  return _.maxBy(state.people, person => person.age);
-});
+// store.createView('oldestPerson', state => {
+//   return _.maxBy(state.people, person => person.age);
+// });
 
-store.createView('currentPerson', state => {
-  return state.people[state.currentPerson];
-});
+// store.createView('currentPerson', state => {
+//   return state.people[state.currentPerson];
+// });
 
-store.emit('User.SelectBtn.click');
+// store.emit('User.SelectBtn.click');

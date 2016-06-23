@@ -35,6 +35,7 @@
     "webpack": "^1.12.14"
   },
   "dependencies": {
+    "deep-diff": "^0.3.4",
     "lodash": "^4.6.1"
   },
   "browser": {
