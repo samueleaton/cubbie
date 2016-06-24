@@ -9,7 +9,8 @@
     "bundle-demo": "webpack --config webpack.demo.config.js",
     "screwy": "screwy",
     "electron-demo": "electron demos/electron-demo.js",
-    "lint": "eslint --max-warnings 8 -c .eslintrc.json src/"
+    "lint": "eslint --max-warnings 8 -c .eslintrc.json src/",
+    "test": "jasmine"
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,7 @@
     "babel-loader": "^6.2.3",
     "babel-preset-es2015": "^6.3.13",
     "eslint": "^2.13.0",
+    "jasmine": "^2.4.1",
     "screwy": "^1.0.3",
     "webpack": "^1.12.14"
   },
