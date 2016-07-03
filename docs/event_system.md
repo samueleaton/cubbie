@@ -121,7 +121,7 @@ store.emit('UserPreferences.SecuritySection.EditBtn.click', 'Yay!');
 
 ### Event Logging
 
-To enable colorful event logging in the console, run `eventLogging(true)` method on the store. To disable, `eventLogging(false)`.
+To enable colorful event logging in the console, run `eventLogging.enable()` method on the store. To disable, `eventLogging.disable()`.
 
 This will log every time an event is emitted.
 
@@ -129,3 +129,5 @@ This will log every time an event is emitted.
 
 If there *ARE* any event listeners associated with the event, the log will be a sea-green <img align="bottom" title="cubbie event log sea greeen" alt="cubbie event log sea greeen" src="https://raw.githubusercontent.com/samueleaton/design/master/sea-green.jpg"> color, otherwise it will an orange <img align="bottom" title="cubbie event log orange" alt="cubbie event log orange" src="https://raw.githubusercontent.com/samueleaton/design/master/orange.jpg"> color.
 However, any of the built in state events will be purple <img align="bottom" title="cubbie event log purple" alt="cubbie event log purple" src="https://raw.githubusercontent.com/samueleaton/design/master/purple.jpg">.
+
+You can pass an optional string to the `enable` method to change the output from `Cubbie Event` to `YourString Event`.
