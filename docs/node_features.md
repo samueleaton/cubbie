@@ -20,14 +20,14 @@ This will create the file if it doesn't exist but it will not write any contents
 
 ### Saving the Store to a File
 
-To write the contents of the file, run the `commitStore` method.
+To write the contents of the file, run the `commit` method.
 
 Example
 
 ``` javascript
 const store = cubbie.createStore({ file: 'path/to/file' });
 store.setInitialState({/*...*/});
-store.commitStore();
+store.commit();
 ```
 
 This will trigger the `STORE_COMMITTED` event.
@@ -48,16 +48,16 @@ store.commit({ pretty: true, clean: true });
 
 ### Loading the Store from a File
 
-To read in the contents of the file, run the `fetchStore` method.
+To read in the contents of the file, run the `fetch` method.
 
 Example
 
 ``` javascript
 const store = cubbie.createStore({ file: 'path/to/file' });
 store.setInitialState({/*...*/});
-store.commitStore();
+store.commit();
 /*...*/
-store.fetchStore();
+store.fetch();
 ```
 
 This will merge the store from the file with current state history (even if its empty), remove duplicate states by id, and order the states by timestamp of when they were created.
@@ -97,9 +97,9 @@ const store = cubbie.createStore({
     }
 });
 store.setInitialState({/*...*/});
-store.commitStore();
+store.commit();
 /*...*/
-store.fetchStore();
+store.fetch();
 ```
 
-This will cause cubbie to decrypt on `fetchStore` and to encrypt on `commitStore` before reading to or writing from disk
+This will cause cubbie to decrypt on `fetch` and to encrypt on `commit` before reading to or writing from disk
