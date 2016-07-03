@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 const store = cubbie.createStore();
 
-store.eventLogging(true);
+store.eventLogging.enable('Demo');
 
 window.store = store;
 

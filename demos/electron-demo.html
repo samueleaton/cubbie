@@ -19,7 +19,7 @@
 
   window.store = store;
 
-  store.eventLogging(true);
+  store.eventLogging.enable('Demo');
 
   store.on(store.stateEvents, () => {
     console.log('\nstate event emitted');

@@ -10,7 +10,8 @@
     "screwy": "screwy",
     "electron-demo": "electron demos/electron-demo.js",
     "lint": "eslint --max-warnings 8 -c .eslintrc.json src/",
-    "test": "jasmine"
+    "test": "jasmine",
+    "prebublish": "if [ ! -f dist/cubbie.bundle.js ]; then exit 1; fi"
   },
   "repository": {
     "type": "git",
