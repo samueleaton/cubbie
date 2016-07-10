@@ -169,7 +169,7 @@ store.purge();
 
 The `purge` method will trigger the `STORE_PURGED` event.
 
-(**Note**: As of version 2.1.0, `purgeStateHistory` was removed in favor of `purge`, which no longer saves the initial state, just the current state)
+(**Note**: As of version 3.0.0, `purgeStateHistory` was removed in favor of `purge`, which no longer saves the initial state, just the current state)
 
 ### Cleaning the State History
 
