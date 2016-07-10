@@ -4,7 +4,7 @@ Backlog to reach v2.0.1:
 
 - [ ] Fix where log will no longer show orange if `once` method used
 - [ ] Update `once` method to actually remove the listener once it is ran instead of it just being ignored
-- [ ] Object.freeze is available, implement a deep freeze and do not ever clone current state
+- [x] implement a deep freeze and do not ever clone current state
 
 Backlog to reach v2.1.0:
 

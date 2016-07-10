@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "deep-diff": "^0.3.4",
+    "deep-freeze": "0.0.1",
     "lodash": "^4.6.1"
   },
   "browser": {
