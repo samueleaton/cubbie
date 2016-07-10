@@ -159,15 +159,17 @@ store.view('oldestPerson'); // {name: 'sam', age: 25}
 
 ### Purging the State History
 
-If you want to clear the state history, for example to save memory, you can run this method.
+If you want to clear the state history, for example to save memory, use the `purge` method.
 
-It will remove all states from the state history **except for the initial state and the current state**. The current state will remain intact and no state events will be triggered.
+Purging the store will remove all of the states from the state history **except for the current state**. Because the current state is the only state that is not removed, it will become the new initial state.
 
 ``` javascript
-store.purgeStateHistory();
+store.purge();
 ```
 
-(Note: `clean` is more advanced than purging. Purge is being considered for deprecation or re-haul)
+The `purge` method will trigger the `STORE_PURGED` event.
+
+(**Note**: As of version 2.1.0, `purgeStateHistory` was removed in favor of `purge`, which no longer saves the initial state, just the current state)
 
 ### Cleaning the State History
 

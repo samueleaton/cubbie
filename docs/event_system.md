@@ -8,7 +8,7 @@ store.on('EVENT_NAME', () => {
 });
 ```
 
-A single listener can be attached to multiple events by passing the events names as an array. So, for example, to add a listener for all of the "State Events" (Built-in Events) you can do the following:
+A single listener can be attached to multiple events by passing the events names as an array. So, for example, to add a listener for all of the "Cubbie Events" (Built-in Events) you can do the following:
 
 ``` javascript
 store.on(
@@ -27,10 +27,10 @@ store.on(
 )
 ```
 
-But because you can get an array of all state events using `store.stateEvents` you could shorten the above code to:
+But because you can get an array of all cubbie events using `store.cubbieEvents` you could shorten the above code to:
 
 ``` javascript
-store.on(store.stateEvents, () => {
+store.on(store.cubbieEvents, () => {
   // code here...
 })
 ```
@@ -53,9 +53,9 @@ store.off('EVENT_NAME' [, callback]);
 
 This remove the event listener for the event. If the callback is omitted, all listeners for the event will be removed.
 
-### Built-in Events (`stateEvents`)
+### Built-in Events (`cubbieEvents`)
 
-Custom events can be added and emitted, but there are 5 built-in *State Events*.
+Custom events can be added and emitted, but there are 5 built-in *Cubbie Events*.
 
 - `STATE_SET` - Triggered on `store.initialState = {};` or `store.setInitialState({})`
 - `STATE_RESET` - Triggered on `store.resetState();`
@@ -67,7 +67,7 @@ Custom events can be added and emitted, but there are 5 built-in *State Events*.
 
 The only purpose of `probeState()` is to trigger the `STATE_PROBED` event.
 
-To get an array of all state events, access the `stateEvents` property.
+To get an array of all cubbie events, access the `cubbieEvents` property.
 
 ### Event Namespacing
 
@@ -128,6 +128,6 @@ This will log every time an event is emitted.
 <img title="cubbie event logging" alt="cubbie event logging" src="https://raw.githubusercontent.com/samueleaton/design/master/cubbie_event_log.jpg"> 
 
 If there *ARE* any event listeners associated with the event, the log will be a sea-green <img align="bottom" title="cubbie event log sea greeen" alt="cubbie event log sea greeen" src="https://raw.githubusercontent.com/samueleaton/design/master/sea-green.jpg"> color, otherwise it will an orange <img align="bottom" title="cubbie event log orange" alt="cubbie event log orange" src="https://raw.githubusercontent.com/samueleaton/design/master/orange.jpg"> color.
-However, any of the built in state events will be purple <img align="bottom" title="cubbie event log purple" alt="cubbie event log purple" src="https://raw.githubusercontent.com/samueleaton/design/master/purple.jpg">.
+However, any of the built in cubbie events will be purple <img align="bottom" title="cubbie event log purple" alt="cubbie event log purple" src="https://raw.githubusercontent.com/samueleaton/design/master/purple.jpg">.
 
 You can pass an optional string to the `enable` method to change the output from `Cubbie Event` to `YourString Event`. This helps distinguish multiple stores.
