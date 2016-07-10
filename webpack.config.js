@@ -4,17 +4,22 @@ module.exports = {
   entry: './index.js',
   output: {
     path: './dist/',
-    filename: 'cubbie.bundle.js',
+    filename: 'cubbie.min.js',
     library: 'cubbie',
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+    sourceMapFilename: 'cubbie.min.map'
   },
   target: 'node',
   node: {
     process: false
   },
+  devtool: 'source-map',
   plugins: [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+    }),
+    new webpack.optimize.UglifyJsPlugin({
+      compressor: { warnings: false }
     })
   ],
   module: {
