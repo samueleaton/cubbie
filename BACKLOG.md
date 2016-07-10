@@ -1,4 +1,4 @@
-# Cubbie 1.0 Backlog
+# Cubbie Backlog
 
 Backlog to reach v2.0.1:
 
