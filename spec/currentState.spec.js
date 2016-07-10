@@ -1,6 +1,6 @@
 /* eslint-disable */
 describe('current state', () => {
-  let cubbie = require('../dist/cubbie.bundle.js');
+  let cubbie = require('../dist/cubbie.min.js');
   let store;
 
   beforeEach(() => {
