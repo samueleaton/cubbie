@@ -119,6 +119,24 @@ store.emit('UserPreferences.SecuritySection.EditBtn.click', 'Yay!');
 // * clicked UserPreferences.SecuritySection.EditBtn: Yay!
 ```
 
+#### Global Event Namespace
+
+There is one certain namespace that is a little unique—the `global` namespace. The global namespace is created the same way as other namespaces (using the `setEventNamespace()` method). The main difference is that with the global namespace, the `global` prefix is optional when emitting an event.
+
+``` javascript
+store.setEventNamespace('global', {
+  sayHello() {
+    console.log('Hello!');
+  }
+});
+store.emit('global.sayHello');
+//=> Hello!
+store.emit('sayHello');
+//=> Hello!
+```
+
+We were able to emit the event with or without the `global.` prefix. The purpose of the global namespace is to *standardize* a location for you to store all top-level events so that they aren't scattered throughout your application.
+
 ### Event Logging
 
 To enable colorful event logging in the console, run `eventLogging.enable()` method on the store. To disable, `eventLogging.disable()`.
